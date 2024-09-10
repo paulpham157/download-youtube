@@ -75,6 +75,7 @@ class YouTubeDownloaderApp(QWidget):
         self.download_dir = get_download_dir()
         self.initUI()
         self.downloader = None
+        self.is_paused = False
 
     def initUI(self):
         self.setWindowTitle("YouTube Playlist Downloader")
@@ -105,10 +106,15 @@ class YouTubeDownloaderApp(QWidget):
         layout.addWidget(self.progress_bar)
 
         button_layout = QHBoxLayout()
-        self.cancel_button = QPushButton("Cancel")
+        self.cancel_button = QPushButton("Pause")
         self.cancel_button.clicked.connect(self.cancel_download)
         self.cancel_button.setEnabled(False)
         button_layout.addWidget(self.cancel_button)
+
+        self.continue_button = QPushButton("Continue")
+        self.continue_button.clicked.connect(self.continue_download)
+        self.continue_button.setEnabled(False)
+        button_layout.addWidget(self.continue_button)
 
         self.exit_button = QPushButton("Exit")
         self.exit_button.clicked.connect(self.close)
@@ -124,9 +130,7 @@ class YouTubeDownloaderApp(QWidget):
             self.status_label.setText("Please enter a valid YouTube playlist URL")
             return
 
-        # Khởi tạo DownloaderThread
         self.downloader = DownloaderThread(url)
-
         self.downloader.progress.connect(self.update_progress)
         self.downloader.finished.connect(self.download_finished)
         self.downloader.error.connect(self.download_error)
@@ -134,16 +138,25 @@ class YouTubeDownloaderApp(QWidget):
         self.downloader.start()
         self.start_button.setEnabled(False)
         self.cancel_button.setEnabled(True)
+        self.continue_button.setEnabled(False)
         self.progress_bar.show()
         self.status_label.setText("Downloading...")
+        self.is_paused = False
 
     def cancel_download(self):
         if self.downloader and self.downloader.isRunning():
             self.downloader.cancel()
-            self.status_label.setText("Download cancelled")
+            self.status_label.setText("Waiting for you...")
             self.start_button.setEnabled(True)
             self.cancel_button.setEnabled(False)
+            self.continue_button.setEnabled(True)
             self.progress_bar.hide()
+            self.is_paused = True
+
+    def continue_download(self):
+        if self.is_paused:
+            self.start_download()
+            self.continue_button.setEnabled(False)
 
     def update_progress(self, message):
         self.status_label.setText(message)
@@ -152,13 +165,17 @@ class YouTubeDownloaderApp(QWidget):
         self.status_label.setText("Download completed")
         self.start_button.setEnabled(True)
         self.cancel_button.setEnabled(False)
+        self.continue_button.setEnabled(False)
         self.progress_bar.hide()
+        self.is_paused = False
 
     def download_error(self, error_message):
         self.status_label.setText(f"Error: {error_message}")
         self.start_button.setEnabled(True)
         self.cancel_button.setEnabled(False)
+        self.continue_button.setEnabled(False)
         self.progress_bar.hide()
+        self.is_paused = False
 
 
 if __name__ == "__main__":
