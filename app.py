@@ -80,7 +80,7 @@ class YouTubeDownloaderApp(QWidget):
         self.center()
 
     def initUI(self):
-        self.setWindowTitle("YouTube Playlist Downloader")
+        self.setWindowTitle("Download playlist YT as audio files")
         self.setFixedSize(800, 200)  # Tăng độ rộng từ 500 lên 800
 
         layout = QVBoxLayout()
