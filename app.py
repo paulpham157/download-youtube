@@ -13,7 +13,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 import yt_dlp
-from PyQt6.QtGui import QScreen  # Thêm import này ở đây
+from PyQt6.QtGui import QScreen, QFont, QColor, QPalette  # Thêm import này ở đây
 
 
 def get_download_dir():
@@ -77,7 +77,7 @@ class YouTubeDownloaderApp(QWidget):
         self.initUI()
         self.downloader = None
         self.is_paused = False
-        self.center()  # Gọi phương thức center() sau khi khởi tạo UI
+        self.center()
 
     def initUI(self):
         self.setWindowTitle("YouTube Playlist Downloader")
@@ -108,14 +108,36 @@ class YouTubeDownloaderApp(QWidget):
         layout.addWidget(self.progress_bar)
 
         button_layout = QHBoxLayout()
-        self.cancel_button = QPushButton("Pause")
-        self.cancel_button.clicked.connect(self.cancel_download)
-        self.cancel_button.setEnabled(False)
-        button_layout.addWidget(self.cancel_button)
+        self.pause_button = QPushButton("Pause")
+        self.pause_button.clicked.connect(self.pause_download)
+        self.pause_button.setEnabled(False)
+        button_layout.addWidget(self.pause_button)
 
         self.continue_button = QPushButton("Continue")
         self.continue_button.clicked.connect(self.continue_download)
-        self.continue_button.setEnabled(False)
+        self.continue_button.hide()  # Ẩn nút Continue ban đầu
+
+        # Tạo font lớn hơn cho nút Continue
+        continue_font = QFont()
+        continue_font.setPointSize(14)  # Tăng kích thước font
+        continue_font.setBold(True)  # Đặt font in đậm
+        self.continue_button.setFont(continue_font)
+
+        # Tăng kích thước nút Continue
+        self.continue_button.setMinimumSize(150, 50)  # Đặt kích thước tối thiểu
+
+        # Tạo màu nền nổi bật cho nút Continue
+        palette = self.continue_button.palette()
+        palette.setColor(
+            QPalette.ColorRole.Button, QColor(0, 128, 255)
+        )  # Màu xanh dương
+        palette.setColor(
+            QPalette.ColorRole.ButtonText, Qt.GlobalColor.white
+        )  # Chữ màu trắng
+        self.continue_button.setPalette(palette)
+        self.continue_button.setAutoFillBackground(True)
+        self.continue_button.update()
+
         button_layout.addWidget(self.continue_button)
 
         self.exit_button = QPushButton("Exit")
@@ -147,26 +169,28 @@ class YouTubeDownloaderApp(QWidget):
 
         self.downloader.start()
         self.start_button.setEnabled(False)
-        self.cancel_button.setEnabled(True)
-        self.continue_button.setEnabled(False)
+        self.pause_button.setEnabled(True)
+        self.pause_button.show()
+        self.continue_button.hide()
         self.progress_bar.show()
         self.status_label.setText("Downloading...")
         self.is_paused = False
 
-    def cancel_download(self):
+    def pause_download(self):
         if self.downloader and self.downloader.isRunning():
             self.downloader.cancel()
             self.status_label.setText("Waiting for you...")
-            self.start_button.setEnabled(True)
-            self.cancel_button.setEnabled(False)
-            self.continue_button.setEnabled(True)
+            self.start_button.setEnabled(False)
+            self.pause_button.hide()  # Ẩn nút Pause
+            self.continue_button.show()  # Hiển thị nút Continue
             self.progress_bar.hide()
             self.is_paused = True
 
     def continue_download(self):
         if self.is_paused:
             self.start_download()
-            self.continue_button.setEnabled(False)
+            self.continue_button.hide()  # Ẩn nút Continue
+            self.pause_button.show()  # Hiển thị lại nút Pause
 
     def update_progress(self, message):
         self.status_label.setText(message)
@@ -174,16 +198,18 @@ class YouTubeDownloaderApp(QWidget):
     def download_finished(self):
         self.status_label.setText("Download completed")
         self.start_button.setEnabled(True)
-        self.cancel_button.setEnabled(False)
-        self.continue_button.setEnabled(False)
+        self.pause_button.setEnabled(False)
+        self.pause_button.show()
+        self.continue_button.hide()
         self.progress_bar.hide()
         self.is_paused = False
 
     def download_error(self, error_message):
         self.status_label.setText(f"Error: {error_message}")
         self.start_button.setEnabled(True)
-        self.cancel_button.setEnabled(False)
-        self.continue_button.setEnabled(False)
+        self.pause_button.setEnabled(False)
+        self.pause_button.show()
+        self.continue_button.hide()
         self.progress_bar.hide()
         self.is_paused = False
 
