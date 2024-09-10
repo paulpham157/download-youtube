@@ -81,7 +81,7 @@ class YouTubeDownloaderApp(QWidget):
 
     def initUI(self):
         self.setWindowTitle("YouTube Playlist Downloader")
-        self.setFixedSize(500, 200)  # Đặt kích thước cố định cho cửa sổ
+        self.setFixedSize(800, 200)  # Tăng độ rộng từ 500 lên 800
 
         layout = QVBoxLayout()
 
@@ -92,7 +92,7 @@ class YouTubeDownloaderApp(QWidget):
 
         layout.addLayout(url_layout)
 
-        self.status_label = QLabel("Ready")
+        self.status_label = QLabel("Status: Ready")
         layout.addWidget(self.status_label)
 
         self.download_location_label = QLabel(
@@ -180,7 +180,7 @@ class YouTubeDownloaderApp(QWidget):
     def start_download(self):
         url = self.url_input.text().strip()
         if not url:
-            self.status_label.setText("Please enter a valid YouTube playlist URL")
+            self.set_status("Please enter a valid YouTube playlist URL")
             return
 
         self.downloader = DownloaderThread(url)
@@ -192,13 +192,13 @@ class YouTubeDownloaderApp(QWidget):
         self.start_button.hide()  # Ẩn nút Start
         self.pause_button.show()  # Hiển thị nút Pause
         self.progress_bar.show()
-        self.status_label.setText("Downloading...")
+        self.set_status("Downloading...")
         self.is_paused = False
 
     def pause_download(self):
         if self.downloader and self.downloader.isRunning():
             self.downloader.cancel()
-            self.status_label.setText("Waiting for you...")
+            self.set_status("Waiting for you...")
             self.start_button.setEnabled(False)
             self.pause_button.hide()  # Ẩn nút Pause
             self.continue_button.show()  # Hiển thị nút Continue
@@ -212,21 +212,24 @@ class YouTubeDownloaderApp(QWidget):
             self.pause_button.show()  # Hiển thị lại nút Pause
 
     def update_progress(self, message):
-        self.status_label.setText(message)
+        self.set_status(message)
 
     def download_finished(self):
-        self.status_label.setText("Download completed")
+        self.set_status("Download completed")
         self.start_button.show()  # Hiển thị lại nút Start
         self.pause_button.hide()  # Ẩn nút Pause
         self.progress_bar.hide()
         self.is_paused = False
 
     def download_error(self, error_message):
-        self.status_label.setText(f"Error: {error_message}")
+        self.set_status(f"Error: {error_message}")
         self.start_button.show()  # Hiển thị lại nút Start
         self.pause_button.hide()  # Ẩn nút Pause
         self.progress_bar.hide()
         self.is_paused = False
+
+    def set_status(self, message):
+        self.status_label.setText(f"Status: {message}")
 
 
 if __name__ == "__main__":
