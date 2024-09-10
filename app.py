@@ -1,5 +1,6 @@
 import sys
 import os
+from pathlib import Path
 from PyQt6.QtWidgets import (
     QApplication,
     QWidget,
@@ -14,6 +15,13 @@ from PyQt6.QtCore import Qt, QThread, pyqtSignal
 import yt_dlp
 
 
+def get_download_dir():
+    home_dir = Path.home()
+    download_dir = home_dir / "Downloads" / "YouTubeDownloader"
+    download_dir.mkdir(parents=True, exist_ok=True)
+    return str(download_dir)
+
+
 class DownloaderThread(QThread):
     progress = pyqtSignal(str)
     finished = pyqtSignal()
@@ -23,6 +31,7 @@ class DownloaderThread(QThread):
         super().__init__()
         self.url = url
         self.is_cancelled = False
+        self.download_dir = get_download_dir()
 
     def run(self):
         ydl_opts = {
@@ -34,7 +43,7 @@ class DownloaderThread(QThread):
                     "preferredquality": "192",
                 }
             ],
-            "outtmpl": "%(title)s.%(ext)s",
+            "outtmpl": os.path.join(self.download_dir, "%(title)s.%(ext)s"),
             "progress_hooks": [self.progress_hook],
         }
 
@@ -63,12 +72,13 @@ class DownloaderThread(QThread):
 class YouTubeDownloaderApp(QWidget):
     def __init__(self):
         super().__init__()
+        self.download_dir = get_download_dir()
         self.initUI()
         self.downloader = None
 
     def initUI(self):
         self.setWindowTitle("YouTube Playlist Downloader")
-        self.setGeometry(300, 300, 500, 150)
+        self.setGeometry(300, 300, 500, 200)
 
         layout = QVBoxLayout()
 
@@ -85,6 +95,9 @@ class YouTubeDownloaderApp(QWidget):
 
         self.status_label = QLabel("Ready")
         layout.addWidget(self.status_label)
+
+        self.download_location_label = QLabel(f"Download location: {self.download_dir}")
+        layout.addWidget(self.download_location_label)
 
         self.progress_bar = QProgressBar()
         self.progress_bar.setRange(0, 0)
@@ -111,7 +124,9 @@ class YouTubeDownloaderApp(QWidget):
             self.status_label.setText("Please enter a valid YouTube playlist URL")
             return
 
+        # Khởi tạo DownloaderThread
         self.downloader = DownloaderThread(url)
+
         self.downloader.progress.connect(self.update_progress)
         self.downloader.finished.connect(self.download_finished)
         self.downloader.error.connect(self.download_error)

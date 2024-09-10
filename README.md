@@ -45,6 +45,16 @@ This application allows users to download YouTube playlist videos as MP3 files.
 2. Enter the URL of the YouTube playlist you want to download.
 3. Click the "Start" button to begin downloading.
 4. The application will download each video in the playlist as an MP3 file.
+5. The download progress and status will be displayed in the application window.
+
+## Download Location
+
+The downloaded MP3 files will be saved in a folder named "YouTubeDownloader" within your user's "Downloads" directory. The exact path will be:
+
+- On macOS: `/Users/your_username/Downloads/YouTubeDownloader/`
+- On Windows: `C:\Users\your_username\Downloads\YouTubeDownloader\`
+
+You can find the downloaded files in this location after the download process is complete.
 
 ## Note
 
