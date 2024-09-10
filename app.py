@@ -87,17 +87,19 @@ class DownloaderThread(QThread):
             filename = os.path.basename(d["filename"])
 
             try:
-                self.progress.emit(f"Đang tải {percent}: {filename}")
+                self.progress.emit(f"Đang kéo webpage {percent}: {filename}")
             except UnicodeEncodeError:
                 self.progress.emit(
-                    f"Đang tải {percent}: (Tên file không hiển thị được)"
+                    f"Đang kéo webpage {percent}: Có vấn đề với UTF-8 với tên file"
                 )
         elif d["status"] == "finished":
             filename = os.path.basename(d["filename"])
             try:
-                self.progress.emit(f"Tải xong: {filename}")
+                self.progress.emit(f"Chuẩn bị hoàn tất: {filename}")
             except UnicodeEncodeError:
-                self.progress.emit("Tải xong: (Tên file không hiển thị được)")
+                self.progress.emit(
+                    "Chuẩn bị hoàn tất: Có vấn đề với UTF-8 với tên file"
+                )
 
     def cancel(self):
         self.is_cancelled = True
@@ -309,7 +311,7 @@ class YouTubeDownloaderApp(QWidget):
 
     def download_finished(self):
         self.set_status(
-            "Tải xong hết playlist rồi anh ạ, anh dán playlist khác vào để tải tiếp hoặc là thoát nếu đã xong"
+            "Tải xong hết rồi anh ạ, anh dán URL khác vào để tải tiếp hoặc là thoát nếu đã xong"
         )
         self.start_button.show()
         self.pause_button.hide()
