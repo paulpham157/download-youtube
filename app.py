@@ -13,6 +13,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 import yt_dlp
+from PyQt6.QtGui import QScreen  # Thêm import này ở đây
 
 
 def get_download_dir():
@@ -76,10 +77,11 @@ class YouTubeDownloaderApp(QWidget):
         self.initUI()
         self.downloader = None
         self.is_paused = False
+        self.center()  # Gọi phương thức center() sau khi khởi tạo UI
 
     def initUI(self):
         self.setWindowTitle("YouTube Playlist Downloader")
-        self.setGeometry(300, 300, 500, 200)
+        self.setFixedSize(500, 200)  # Đặt kích thước cố định cho cửa sổ
 
         layout = QVBoxLayout()
 
@@ -123,6 +125,14 @@ class YouTubeDownloaderApp(QWidget):
         layout.addLayout(button_layout)
 
         self.setLayout(layout)
+
+    def center(self):
+        qr = self.frameGeometry()
+        screen = QApplication.primaryScreen()
+        screen_geometry = screen.geometry()
+        cp = screen_geometry.center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
 
     def start_download(self):
         url = self.url_input.text().strip()
