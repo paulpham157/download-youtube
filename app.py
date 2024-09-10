@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import sys
 import os
 from pathlib import Path
@@ -57,7 +58,7 @@ class DownloaderThread(QThread):
                     "preferredquality": "192",
                 }
             ],
-            "outtmpl": os.path.join(self.download_dir, "%(playlist_title)s.%(ext)s"),
+            "outtmpl": os.path.join(self.download_dir, "%(title)s.%(ext)s"),
             "progress_hooks": [self.progress_hook],
             "ffmpeg_location": self.ffmpeg_path,
         }
@@ -66,13 +67,11 @@ class DownloaderThread(QThread):
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(self.url, download=False)
                 if "entries" in info:
-                    # Đây là một playlist
                     self.playlist_title = info.get("title", "Unknown Playlist")
                     playlist_dir = os.path.join(self.download_dir, self.playlist_title)
                     os.makedirs(playlist_dir, exist_ok=True)
                     self.progress.emit(f"Tạo thư mục: {self.playlist_title}")
                 else:
-                    # Đây là một video đơn lẻ
                     self.playlist_title = None
 
                 ydl.download([self.url])
@@ -87,10 +86,18 @@ class DownloaderThread(QThread):
             percent = d["_percent_str"]
             filename = os.path.basename(d["filename"])
 
-            self.progress.emit(f"Đang tải {percent}: {filename}")
+            try:
+                self.progress.emit(f"Đang tải {percent}: {filename}")
+            except UnicodeEncodeError:
+                self.progress.emit(
+                    f"Đang tải {percent}: (Tên file không hiển thị được)"
+                )
         elif d["status"] == "finished":
             filename = os.path.basename(d["filename"])
-            self.progress.emit(f"Tải xong: {filename}")
+            try:
+                self.progress.emit(f"Tải xong: {filename}")
+            except UnicodeEncodeError:
+                self.progress.emit("Tải xong: (Tên file không hiển thị được)")
 
     def cancel(self):
         self.is_cancelled = True
