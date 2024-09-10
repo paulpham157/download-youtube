@@ -10,10 +10,16 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QLabel,
     QProgressBar,
+    QMessageBox,
 )
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 import yt_dlp
 from PyQt6.QtGui import QScreen, QFont, QColor, QPalette  # Thêm import này ở đây
+import shutil
+
+
+def check_ffmpeg():
+    return shutil.which("ffmpeg") is not None
 
 
 def get_download_dir():
@@ -78,9 +84,10 @@ class YouTubeDownloaderApp(QWidget):
         self.downloader = None
         self.is_paused = False
         self.center()
+        self.check_dependencies()
 
     def initUI(self):
-        self.setWindowTitle("Download playlist YT as audio files")
+        self.setWindowTitle("YouTube Playlist Downloader")
         self.setFixedSize(800, 200)  # Tăng độ rộng từ 500 lên 800
 
         layout = QVBoxLayout()
@@ -177,10 +184,25 @@ class YouTubeDownloaderApp(QWidget):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
+    def check_dependencies(self):
+        if not check_ffmpeg():
+            QMessageBox.warning(
+                self,
+                "Thiếu phụ thuộc",
+                "Không tìm thấy ffmpeg. Vui lòng cài đặt ffmpeg và đảm bảo nó nằm trong PATH hệ thống.",
+                QMessageBox.StandardButton.Ok,
+            )
+
     def start_download(self):
+        if not check_ffmpeg():
+            self.set_status(
+                "Lỗi: ffmpeg không được cài đặt. Vui lòng cài đặt ffmpeg trước khi tải xuống."
+            )
+            return
+
         url = self.url_input.text().strip()
         if not url:
-            self.set_status("Please enter a valid YouTube playlist URL")
+            self.set_status("Vui lòng nhập URL playlist YouTube hợp lệ")
             return
 
         self.downloader = DownloaderThread(url)
@@ -222,7 +244,16 @@ class YouTubeDownloaderApp(QWidget):
         self.is_paused = False
 
     def download_error(self, error_message):
-        self.set_status(f"Error: {error_message}")
+        if "ffprobe and ffmpeg not found" in error_message:
+            self.set_status("Lỗi: ffmpeg không được cài đặt hoặc không nằm trong PATH")
+            QMessageBox.warning(
+                self,
+                "Lỗi ffmpeg",
+                "Không tìm thấy ffmpeg. Vui lòng cài đặt ffmpeg và đảm bảo nó nằm trong PATH hệ thống.",
+                QMessageBox.StandardButton.Ok,
+            )
+        else:
+            self.set_status(f"Lỗi: {error_message}")
         self.start_button.show()  # Hiển thị lại nút Start
         self.pause_button.hide()  # Ẩn nút Pause
         self.progress_bar.hide()
