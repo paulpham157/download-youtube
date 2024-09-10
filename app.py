@@ -57,9 +57,7 @@ class DownloaderThread(QThread):
                     "preferredquality": "192",
                 }
             ],
-            "outtmpl": os.path.join(
-                self.download_dir, "%(playlist_title)s", "%(title)s.%(ext)s"
-            ),
+            "outtmpl": os.path.join(self.download_dir, "%(playlist_title)s.%(ext)s"),
             "progress_hooks": [self.progress_hook],
             "ffmpeg_location": self.ffmpeg_path,
         }
@@ -72,7 +70,7 @@ class DownloaderThread(QThread):
                     self.playlist_title = info.get("title", "Unknown Playlist")
                     playlist_dir = os.path.join(self.download_dir, self.playlist_title)
                     os.makedirs(playlist_dir, exist_ok=True)
-                    self.progress.emit(f"Tạo thư mục: {playlist_dir}")
+                    self.progress.emit(f"Tạo thư mục: {self.playlist_title}")
                 else:
                     # Đây là một video đơn lẻ
                     self.playlist_title = None
@@ -87,11 +85,12 @@ class DownloaderThread(QThread):
     def progress_hook(self, d):
         if d["status"] == "downloading":
             percent = d["_percent_str"]
-            filename = d["filename"]
-            self.progress.emit(f"Đang tải: {filename} - {percent}")
+            filename = os.path.basename(d["filename"])
+
+            self.progress.emit(f"Đang tải {percent}: {filename}")
         elif d["status"] == "finished":
-            filename = d["filename"]
-            self.progress.emit(f"Đã tải xong: {filename}")
+            filename = os.path.basename(d["filename"])
+            self.progress.emit(f"Tải xong: {filename}")
 
     def cancel(self):
         self.is_cancelled = True
@@ -150,7 +149,7 @@ class YouTubeDownloaderApp(QWidget):
 
     def initUI(self):
         self.setWindowTitle("Diu Túp downloader by Paul Pham 157")
-        self.setFixedSize(800, 200)
+        self.setFixedSize(900, 300)
 
         layout = QVBoxLayout()
 
@@ -279,13 +278,13 @@ class YouTubeDownloaderApp(QWidget):
         self.start_button.hide()
         self.pause_button.show()
         self.progress_bar.show()
-        self.set_status("Đang tải xuống...")
+        self.set_status("Đang chuẩn bị...")
         self.is_paused = False
 
     def pause_download(self):
         if self.downloader and self.downloader.isRunning():
             self.downloader.cancel()
-            self.set_status("Đang chờ bạn nhấn tiếp tục đấy...")
+            self.set_status("Đang chờ anh nhấn tiếp tục đấy...")
             self.start_button.setEnabled(False)
             self.pause_button.hide()
             self.continue_button.show()
