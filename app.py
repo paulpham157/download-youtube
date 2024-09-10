@@ -90,16 +90,14 @@ class YouTubeDownloaderApp(QWidget):
         self.url_input.setPlaceholderText("Enter YouTube playlist URL")
         url_layout.addWidget(self.url_input)
 
-        self.start_button = QPushButton("Start")
-        self.start_button.clicked.connect(self.start_download)
-        url_layout.addWidget(self.start_button)
-
         layout.addLayout(url_layout)
 
         self.status_label = QLabel("Ready")
         layout.addWidget(self.status_label)
 
-        self.download_location_label = QLabel(f"Download location: {self.download_dir}")
+        self.download_location_label = QLabel(
+            f"Your mp3 will be saved in: {self.download_dir}"
+        )
         layout.addWidget(self.download_location_label)
 
         self.progress_bar = QProgressBar()
@@ -108,9 +106,32 @@ class YouTubeDownloaderApp(QWidget):
         layout.addWidget(self.progress_bar)
 
         button_layout = QHBoxLayout()
+        self.start_button = QPushButton("START")
+        self.start_button.clicked.connect(self.start_download)
+
+        # Tùy chỉnh nút Start
+        start_font = QFont()
+        start_font.setPointSize(self.font().pointSize() + 2)  # Tăng cỡ chữ thêm 2px
+        start_font.setBold(True)  # In đậm
+        self.start_button.setFont(start_font)
+
+        # Đặt màu nền và màu chữ
+        start_palette = self.start_button.palette()
+        start_palette.setColor(
+            QPalette.ColorRole.Button, QColor(0, 255, 0)
+        )  # Màu xanh lá cây
+        start_palette.setColor(
+            QPalette.ColorRole.ButtonText, Qt.GlobalColor.white
+        )  # Chữ màu trắng
+        self.start_button.setPalette(start_palette)
+        self.start_button.setAutoFillBackground(True)
+        self.start_button.update()
+
+        button_layout.addWidget(self.start_button)
+
         self.pause_button = QPushButton("Pause")
         self.pause_button.clicked.connect(self.pause_download)
-        self.pause_button.setEnabled(False)
+        self.pause_button.hide()  # Ẩn nút Pause ban đầu
         button_layout.addWidget(self.pause_button)
 
         self.continue_button = QPushButton("Continue")
@@ -168,10 +189,8 @@ class YouTubeDownloaderApp(QWidget):
         self.downloader.error.connect(self.download_error)
 
         self.downloader.start()
-        self.start_button.setEnabled(False)
-        self.pause_button.setEnabled(True)
-        self.pause_button.show()
-        self.continue_button.hide()
+        self.start_button.hide()  # Ẩn nút Start
+        self.pause_button.show()  # Hiển thị nút Pause
         self.progress_bar.show()
         self.status_label.setText("Downloading...")
         self.is_paused = False
@@ -197,19 +216,15 @@ class YouTubeDownloaderApp(QWidget):
 
     def download_finished(self):
         self.status_label.setText("Download completed")
-        self.start_button.setEnabled(True)
-        self.pause_button.setEnabled(False)
-        self.pause_button.show()
-        self.continue_button.hide()
+        self.start_button.show()  # Hiển thị lại nút Start
+        self.pause_button.hide()  # Ẩn nút Pause
         self.progress_bar.hide()
         self.is_paused = False
 
     def download_error(self, error_message):
         self.status_label.setText(f"Error: {error_message}")
-        self.start_button.setEnabled(True)
-        self.pause_button.setEnabled(False)
-        self.pause_button.show()
-        self.continue_button.hide()
+        self.start_button.show()  # Hiển thị lại nút Start
+        self.pause_button.hide()  # Ẩn nút Pause
         self.progress_bar.hide()
         self.is_paused = False
 
