@@ -11,10 +11,15 @@ from PyQt6.QtWidgets import (
     QLabel,
     QProgressBar,
     QMessageBox,
+    QDialog,
+    QVBoxLayout,
+    QLabel,
+    QPushButton,
+    QTextBrowser,
 )
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 import yt_dlp
-from PyQt6.QtGui import QScreen, QFont, QColor, QPalette  # Thêm import này ở đây
+from PyQt6.QtGui import QScreen, QFont, QColor, QPalette
 import shutil
 
 
@@ -34,12 +39,13 @@ class DownloaderThread(QThread):
     finished = pyqtSignal()
     error = pyqtSignal(str)
 
-    def __init__(self, url):
+    def __init__(self, url, ffmpeg_path):
         super().__init__()
         self.url = url
         self.is_cancelled = False
         self.download_dir = get_download_dir()
         self.playlist_title = None
+        self.ffmpeg_path = ffmpeg_path
 
     def run(self):
         ydl_opts = {
@@ -55,6 +61,7 @@ class DownloaderThread(QThread):
                 self.download_dir, "%(playlist_title)s", "%(title)s.%(ext)s"
             ),
             "progress_hooks": [self.progress_hook],
+            "ffmpeg_location": self.ffmpeg_path,
         }
 
         try:
@@ -91,10 +98,50 @@ class DownloaderThread(QThread):
         self.terminate()
 
 
+class InstallationGuideDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Hướng dẫn cài đặt ffmpeg")
+        self.setMinimumSize(400, 300)
+
+        layout = QVBoxLayout()
+
+        guide_text = """
+        Để cài đặt ffmpeg, hãy làm theo hướng dẫn dưới đây tùy theo hệ điều hành của bạn:
+
+        Windows:
+        - Sử dụng Chocolatey: choco install ffmpeg
+        - Hoặc tải xuống từ trang chủ ffmpeg và thêm vào PATH.
+
+        macOS:
+        - Sử dụng Homebrew: brew install ffmpeg
+
+        Linux (Ubuntu/Debian):
+        sudo apt update
+        sudo apt install ffmpeg
+
+        Linux (Fedora):
+        sudo dnf install ffmpeg
+
+        Sau khi cài đặt, hãy khởi động lại ứng dụng.
+        """
+
+        guide_browser = QTextBrowser()
+        guide_browser.setPlainText(guide_text)
+        layout.addWidget(guide_browser)
+
+        close_button = QPushButton("Đóng")
+        close_button.clicked.connect(self.close)
+        layout.addWidget(close_button)
+
+        self.setLayout(layout)
+
+
 class YouTubeDownloaderApp(QWidget):
     def __init__(self):
         super().__init__()
         self.download_dir = get_download_dir()
+        self.ffmpeg_path = self.find_ffmpeg()
         self.initUI()
         self.downloader = None
         self.is_paused = False
@@ -103,7 +150,7 @@ class YouTubeDownloaderApp(QWidget):
 
     def initUI(self):
         self.setWindowTitle("Diu Túp downloader by Paul Pham 157")
-        self.setFixedSize(800, 200)  # Tăng độ rộng từ 500 lên 800
+        self.setFixedSize(800, 200)
 
         layout = QVBoxLayout()
 
@@ -131,20 +178,14 @@ class YouTubeDownloaderApp(QWidget):
         self.start_button = QPushButton("START")
         self.start_button.clicked.connect(self.start_download)
 
-        # Tùy chỉnh nút Start
         start_font = QFont()
-        start_font.setPointSize(self.font().pointSize() + 2)  # Tăng cỡ chữ thêm 2px
-        start_font.setBold(True)  # In đậm
+        start_font.setPointSize(self.font().pointSize() + 2)
+        start_font.setBold(True)
         self.start_button.setFont(start_font)
 
-        # Đặt màu nền và màu chữ
         start_palette = self.start_button.palette()
-        start_palette.setColor(
-            QPalette.ColorRole.Button, QColor(0, 255, 0)
-        )  # Màu xanh lá cây
-        start_palette.setColor(
-            QPalette.ColorRole.ButtonText, Qt.GlobalColor.white
-        )  # Chữ màu trắng
+        start_palette.setColor(QPalette.ColorRole.Button, QColor(0, 255, 0))
+        start_palette.setColor(QPalette.ColorRole.ButtonText, Qt.GlobalColor.white)
         self.start_button.setPalette(start_palette)
         self.start_button.setAutoFillBackground(True)
         self.start_button.update()
@@ -153,30 +194,23 @@ class YouTubeDownloaderApp(QWidget):
 
         self.pause_button = QPushButton("Pause")
         self.pause_button.clicked.connect(self.pause_download)
-        self.pause_button.hide()  # Ẩn nút Pause ban đầu
+        self.pause_button.hide()
         button_layout.addWidget(self.pause_button)
 
         self.continue_button = QPushButton("Continue")
         self.continue_button.clicked.connect(self.continue_download)
-        self.continue_button.hide()  # Ẩn nút Continue ban đầu
+        self.continue_button.hide()
 
-        # Tạo font lớn hơn cho nút Continue
         continue_font = QFont()
-        continue_font.setPointSize(14)  # Tăng kích thước font
-        continue_font.setBold(True)  # Đặt font in đậm
+        continue_font.setPointSize(14)
+        continue_font.setBold(True)
         self.continue_button.setFont(continue_font)
 
-        # Tăng kích thước nút Continue
-        self.continue_button.setMinimumSize(150, 50)  # Đặt kích thước tối thiểu
+        self.continue_button.setMinimumSize(150, 50)
 
-        # Tạo màu nền nổi bật cho nút Continue
         palette = self.continue_button.palette()
-        palette.setColor(
-            QPalette.ColorRole.Button, QColor(0, 128, 255)
-        )  # Màu xanh dương
-        palette.setColor(
-            QPalette.ColorRole.ButtonText, Qt.GlobalColor.white
-        )  # Chữ màu trắng
+        palette.setColor(QPalette.ColorRole.Button, QColor(0, 128, 255))
+        palette.setColor(QPalette.ColorRole.ButtonText, Qt.GlobalColor.white)
         self.continue_button.setPalette(palette)
         self.continue_button.setAutoFillBackground(True)
         self.continue_button.update()
@@ -199,36 +233,51 @@ class YouTubeDownloaderApp(QWidget):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
+    def find_ffmpeg(self):
+        if getattr(sys, "frozen", False):
+            # Nếu đang chạy từ file thực thi đã được đóng gói
+            base_path = sys._MEIPASS
+        else:
+            # Nếu đang chạy từ script
+            base_path = os.path.dirname(os.path.abspath(__file__))
+
+        ffmpeg_path = os.path.join(base_path, "ffmpeg")
+        if sys.platform == "win32":
+            ffmpeg_path += ".exe"
+
+        if os.path.exists(ffmpeg_path):
+            return ffmpeg_path
+        return None
+
     def check_dependencies(self):
-        if not check_ffmpeg():
+        if not self.ffmpeg_path:
             QMessageBox.warning(
                 self,
                 "Thiếu phụ thuộc",
-                "Không tìm thấy ffmpeg. Vui lòng cài đặt ffmpeg và đảm bảo nó nằm trong PATH hệ thống.",
+                "Không tìm thấy ffmpeg. Vui lòng đặt file ffmpeg trong cùng thư mục với ứng dụng.",
                 QMessageBox.StandardButton.Ok,
             )
 
     def start_download(self):
-        if not check_ffmpeg():
+        if not self.ffmpeg_path:
             self.set_status(
-                "Lỗi: ffmpeg không được cài đặt. Vui lòng cài đặt ffmpeg trước khi tải xuống."
+                "Lỗi: Không tìm thấy ffmpeg. Vui lòng đặt file ffmpeg trong cùng thư mục với ứng dụng."
             )
-            self.show_installation_guide()
             return
 
         url = self.url_input.text().strip()
         if not url:
-            self.set_status("Vui lòng nhập URL playlist Diu Túp hợp lệ")
+            self.set_status("Vui lòng nhập URL playlist YouTube hợp lệ")
             return
 
-        self.downloader = DownloaderThread(url)
+        self.downloader = DownloaderThread(url, self.ffmpeg_path)
         self.downloader.progress.connect(self.update_progress)
         self.downloader.finished.connect(self.download_finished)
         self.downloader.error.connect(self.download_error)
 
         self.downloader.start()
-        self.start_button.hide()  # Ẩn nút Start
-        self.pause_button.show()  # Hiển thị nút Pause
+        self.start_button.hide()
+        self.pause_button.show()
         self.progress_bar.show()
         self.set_status("Đang tải xuống...")
         self.is_paused = False
@@ -238,16 +287,16 @@ class YouTubeDownloaderApp(QWidget):
             self.downloader.cancel()
             self.set_status("Đang chờ bạn nhấn tiếp tục đấy...")
             self.start_button.setEnabled(False)
-            self.pause_button.hide()  # Ẩn nút Pause
-            self.continue_button.show()  # Hiển thị nút Continue
+            self.pause_button.hide()
+            self.continue_button.show()
             self.progress_bar.hide()
             self.is_paused = True
 
     def continue_download(self):
         if self.is_paused:
             self.start_download()
-            self.continue_button.hide()  # Ẩn nút Continue
-            self.pause_button.show()  # Hiển thị lại nút Pause
+            self.continue_button.hide()
+            self.pause_button.show()
 
     def update_progress(self, message):
         self.set_status(message)
@@ -256,8 +305,8 @@ class YouTubeDownloaderApp(QWidget):
         self.set_status(
             "Tải xong hết playlist rồi anh ạ, anh dán playlist khác vào để tải tiếp hoặc là thoát nếu đã xong"
         )
-        self.start_button.show()  # Hiển thị lại nút Start
-        self.pause_button.hide()  # Ẩn nút Pause
+        self.start_button.show()
+        self.pause_button.hide()
         self.progress_bar.hide()
         self.is_paused = False
 
