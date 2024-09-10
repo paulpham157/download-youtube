@@ -24,7 +24,7 @@ def check_ffmpeg():
 
 def get_download_dir():
     home_dir = Path.home()
-    download_dir = home_dir / "Downloads" / "YouTubeDownloader"
+    download_dir = home_dir / "Downloads" / "YoutubeDownloaderByPaulPham157"
     download_dir.mkdir(parents=True, exist_ok=True)
     return str(download_dir)
 
@@ -39,6 +39,7 @@ class DownloaderThread(QThread):
         self.url = url
         self.is_cancelled = False
         self.download_dir = get_download_dir()
+        self.playlist_title = None
 
     def run(self):
         ydl_opts = {
@@ -50,13 +51,27 @@ class DownloaderThread(QThread):
                     "preferredquality": "192",
                 }
             ],
-            "outtmpl": os.path.join(self.download_dir, "%(title)s.%(ext)s"),
+            "outtmpl": os.path.join(
+                self.download_dir, "%(playlist_title)s", "%(title)s.%(ext)s"
+            ),
             "progress_hooks": [self.progress_hook],
         }
 
         try:
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info = ydl.extract_info(self.url, download=False)
+                if "entries" in info:
+                    # Đây là một playlist
+                    self.playlist_title = info.get("title", "Unknown Playlist")
+                    playlist_dir = os.path.join(self.download_dir, self.playlist_title)
+                    os.makedirs(playlist_dir, exist_ok=True)
+                    self.progress.emit(f"Tạo thư mục: {playlist_dir}")
+                else:
+                    # Đây là một video đơn lẻ
+                    self.playlist_title = None
+
                 ydl.download([self.url])
+
             if not self.is_cancelled:
                 self.finished.emit()
         except Exception as e:
@@ -66,10 +81,10 @@ class DownloaderThread(QThread):
         if d["status"] == "downloading":
             percent = d["_percent_str"]
             filename = d["filename"]
-            self.progress.emit(f"Downloading: {filename} - {percent}")
+            self.progress.emit(f"Đang tải: {filename} - {percent}")
         elif d["status"] == "finished":
             filename = d["filename"]
-            self.progress.emit(f"Downloaded: {filename}")
+            self.progress.emit(f"Đã tải xong: {filename}")
 
     def cancel(self):
         self.is_cancelled = True
@@ -87,23 +102,23 @@ class YouTubeDownloaderApp(QWidget):
         self.check_dependencies()
 
     def initUI(self):
-        self.setWindowTitle("YouTube Playlist Downloader")
+        self.setWindowTitle("Diu Túp downloader by Paul Pham 157")
         self.setFixedSize(800, 200)  # Tăng độ rộng từ 500 lên 800
 
         layout = QVBoxLayout()
 
         url_layout = QHBoxLayout()
         self.url_input = QLineEdit()
-        self.url_input.setPlaceholderText("Enter YouTube playlist URL")
+        self.url_input.setPlaceholderText("Địa chỉ URL")
         url_layout.addWidget(self.url_input)
 
         layout.addLayout(url_layout)
 
-        self.status_label = QLabel("Status: Ready")
+        self.status_label = QLabel("Ô kê, anh nhấn nút start là được...")
         layout.addWidget(self.status_label)
 
         self.download_location_label = QLabel(
-            f"Your mp3 will be saved in: {self.download_dir}"
+            f"Các file mp3 sẽ lưu tại: {self.download_dir}"
         )
         layout.addWidget(self.download_location_label)
 
@@ -198,11 +213,12 @@ class YouTubeDownloaderApp(QWidget):
             self.set_status(
                 "Lỗi: ffmpeg không được cài đặt. Vui lòng cài đặt ffmpeg trước khi tải xuống."
             )
+            self.show_installation_guide()
             return
 
         url = self.url_input.text().strip()
         if not url:
-            self.set_status("Vui lòng nhập URL playlist YouTube hợp lệ")
+            self.set_status("Vui lòng nhập URL playlist Diu Túp hợp lệ")
             return
 
         self.downloader = DownloaderThread(url)
@@ -214,13 +230,13 @@ class YouTubeDownloaderApp(QWidget):
         self.start_button.hide()  # Ẩn nút Start
         self.pause_button.show()  # Hiển thị nút Pause
         self.progress_bar.show()
-        self.set_status("Downloading...")
+        self.set_status("Đang tải xuống...")
         self.is_paused = False
 
     def pause_download(self):
         if self.downloader and self.downloader.isRunning():
             self.downloader.cancel()
-            self.set_status("Waiting for you...")
+            self.set_status("Đang chờ bạn nhấn tiếp tục đấy...")
             self.start_button.setEnabled(False)
             self.pause_button.hide()  # Ẩn nút Pause
             self.continue_button.show()  # Hiển thị nút Continue
@@ -237,7 +253,9 @@ class YouTubeDownloaderApp(QWidget):
         self.set_status(message)
 
     def download_finished(self):
-        self.set_status("Download completed")
+        self.set_status(
+            "Tải xong hết playlist rồi anh ạ, anh dán playlist khác vào để tải tiếp hoặc là thoát nếu đã xong"
+        )
         self.start_button.show()  # Hiển thị lại nút Start
         self.pause_button.hide()  # Ẩn nút Pause
         self.progress_bar.hide()
@@ -260,7 +278,7 @@ class YouTubeDownloaderApp(QWidget):
         self.is_paused = False
 
     def set_status(self, message):
-        self.status_label.setText(f"Status: {message}")
+        self.status_label.setText(f"Trạng thái: {message}")
 
 
 if __name__ == "__main__":
