@@ -12,15 +12,13 @@ from PyQt6.QtWidgets import (
     QLabel,
     QProgressBar,
     QMessageBox,
-    QDialog,
     QVBoxLayout,
     QLabel,
     QPushButton,
-    QTextBrowser,
 )
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 import yt_dlp
-from PyQt6.QtGui import QScreen, QFont, QColor, QPalette
+from PyQt6.QtGui import QFont, QColor, QPalette
 import shutil
 
 
@@ -65,28 +63,31 @@ class DownloaderThread(QThread):
             ),
             "progress_hooks": [self.progress_hook],
             "ffmpeg_location": self.ffmpeg_path,
+            "extract_flat": True,
         }
 
         try:
-            ydl_opts["extract_flat"] = True
-            ydls = yt_dlp.YoutubeDL(ydl_opts)
-            with ydls as ydl:
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(self.url, download=False)
                 if "entries" in info:
-                    playlist_title = info.get("title", "Unknown Playlist Name")
-                    self.playlist_title = playlist_title
+                    self.playlist_title = info.get("title", "Unknown Playlist Name")
                     self.total_videos = len(info["entries"])
                     self.progress.emit(
-                        f"{self.total_videos} video in playlist {self.playlist_title}"
+                        f"Tìm thấy {self.total_videos} video trong playlist {self.playlist_title}"
                     )
+                    playlist_dir = os.path.join(self.download_dir, self.playlist_title)
+                    os.makedirs(playlist_dir, exist_ok=True)
                     for entry in info["entries"]:
                         if self.is_cancelled:
                             break
                         title = entry.get("title")
                         views = entry.get("view_count")
-                        is_private = title == "[Private video]" or views == None
+                        is_private = title == "[Private video]" or views is None
                         if is_private:
                             self.total_videos -= 1
+                            self.progress.emit(
+                                f"Có 1 video private, còn lại {self.total_videos} video"
+                            )
                             continue
                         else:
                             entry_url = entry.get("url")
@@ -296,7 +297,7 @@ class YouTubeDownloaderApp(QWidget):
 
     def download_finished(self):
         self.set_status(
-            "Tải xong hết rồi anh ạ, anh dán URL khác vào để tải tiếp hoặc là thoát nếu đã xong"
+            f"Tải xong hết rồi anh ạ, anh dán URL khác vào để tải tiếp hoặc là thoát nếu đã xong"
         )
         self.start_button.show()
         self.pause_button.hide()
