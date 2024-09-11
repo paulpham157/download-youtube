@@ -50,6 +50,7 @@ class DownloaderThread(QThread):
         self.url = url
         self.is_cancelled = False
         self.download_dir = get_download_dir()
+        self.original_total_videos = 0
         self.single_list = get_single_dir()
         self.playlist_title = None
         self.ffmpeg_path = ffmpeg_path
@@ -77,9 +78,10 @@ class DownloaderThread(QThread):
                 info = ydl.extract_info(self.url, download=False)
                 if "entries" in info:
                     self.playlist_title = info.get("title", "Unknown Playlist Name")
-                    self.total_videos = len(info["entries"])
+                    self.original_total_videos = len(info["entries"])
+                    self.total_videos = self.original_total_videos
                     self.progress.emit(
-                        f"Tìm thấy {self.total_videos} video trong playlist {self.playlist_title}"
+                        f"Tìm thấy {self.total_videos} video trong playlist {self.playlist_title}\nĐang lọc các video private"
                     )
                     playlist_dir = os.path.join(self.download_dir, self.playlist_title)
                     os.makedirs(playlist_dir, exist_ok=True)
@@ -92,7 +94,7 @@ class DownloaderThread(QThread):
                         if is_private:
                             self.total_videos -= 1
                             self.progress.emit(
-                                f"Có 1 video private, còn lại {self.total_videos} video"
+                                f"Có 1 video private, còn lại {self.total_videos} video, tiếp tục quét"
                             )
                             continue
                         else:
@@ -125,20 +127,20 @@ class DownloaderThread(QThread):
 
             if self.total_videos > 1:
                 self.progress.emit(
-                    f"[{self.current_video + 1}/{self.total_videos}] Đang tải video: {percent} - {filename}"
+                    f"[{self.current_video + 1}/{self.total_videos}] Đang tải video: {percent}\n{filename}"
                 )
             else:
-                self.progress.emit(f"Đang tải video: {percent} - {filename}")
+                self.progress.emit(f"Đang tải video: {percent}\n{filename}")
 
         elif d["status"] == "finished":
             self.current_video += 1
             filename = os.path.basename(d["filename"])
             if self.total_videos > 1:
                 self.progress.emit(
-                    f"[{self.current_video}/{self.total_videos}] Đang chuyển đổi video sang audio: {filename}"
+                    f"[{self.current_video}/{self.total_videos}] Đang chuyển đổi video sang audio:\n{filename}"
                 )
             else:
-                self.progress.emit(f"Đang chuyển đổi video sang audio: {filename}")
+                self.progress.emit(f"Đang chuyển đổi video sang audio:\n{filename}")
 
     def cancel(self):
         self.is_cancelled = True
@@ -310,8 +312,10 @@ class YouTubeDownloaderApp(QWidget):
         self.set_status(message)
 
     def download_finished(self):
+        total_videos = self.downloader.total_videos
+        original_total_videos = self.downloader.original_total_videos
         self.set_status(
-            f"Tải xong hết rồi anh ạ, anh dán URL khác vào để tải tiếp hoặc là thoát nếu đã xong"
+            f"Tải xong {total_videos} public video trên tổng số {original_total_videos} video rồi anh ạ\nCó {original_total_videos - total_videos} video private không tải được\nAnh dán URL khác vào để tải tiếp hoặc là thoát nếu đã xong"
         )
         self.start_button.show()
         self.pause_button.hide()
@@ -335,7 +339,7 @@ class YouTubeDownloaderApp(QWidget):
         self.is_paused = False
 
     def set_status(self, message):
-        self.status_label.setText(f"Trạng thái: {message}")
+        self.status_label.setText(f"Trạng thái:\n{message}")
 
 
 if __name__ == "__main__":
