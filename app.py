@@ -33,6 +33,13 @@ def get_download_dir():
     return str(download_dir)
 
 
+def get_single_dir():
+    home_dir = Path.home()
+    single_dir = home_dir / "Downloads" / "YoutubeDownloaderByPaulPham157" / "Single"
+    single_dir.mkdir(parents=True, exist_ok=True)
+    return str(single_dir)
+
+
 class DownloaderThread(QThread):
     progress = pyqtSignal(str)
     finished = pyqtSignal()
@@ -43,6 +50,7 @@ class DownloaderThread(QThread):
         self.url = url
         self.is_cancelled = False
         self.download_dir = get_download_dir()
+        self.single_list = get_single_dir()
         self.playlist_title = None
         self.ffmpeg_path = ffmpeg_path
         self.total_videos = 0
@@ -91,13 +99,12 @@ class DownloaderThread(QThread):
                             entry_url = entry.get("url")
                             if entry_url:
                                 ydl.download([entry_url])
-                                self.current_video += 1
-                                # Di chuyển file vừa tải đến thư mục playlist
                                 self.move_file_to_playlist(playlist_dir)
                 else:
                     self.total_videos = 1
                     self.progress.emit("Một video đơn")
                     ydl.download([self.url])
+                    self.move_file_to_playlist(self.single_list)
 
             if not self.is_cancelled:
                 self.finished.emit()
