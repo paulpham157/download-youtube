@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import sys
 import os
 from pathlib import Path
@@ -46,6 +47,8 @@ class DownloaderThread(QThread):
         self.download_dir = get_download_dir()
         self.playlist_title = None
         self.ffmpeg_path = ffmpeg_path
+        self.total_videos = 0
+        self.current_video = 0
 
     def run(self):
         ydl_opts = {
@@ -68,16 +71,22 @@ class DownloaderThread(QThread):
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(self.url, download=False)
                 if "entries" in info:
-                    # Đây là một playlist
                     self.playlist_title = info.get("title", "Unknown Playlist")
-                    playlist_dir = os.path.join(self.download_dir, self.playlist_title)
-                    os.makedirs(playlist_dir, exist_ok=True)
-                    self.progress.emit(f"Tạo thư mục: {playlist_dir}")
+                    self.total_videos = len(info["entries"])
+                    self.progress.emit(
+                        f"Playlist: {self.playlist_title} có {self.total_videos} video"
+                    )
+                    for entry in info["entries"]:
+                        if self.is_cancelled:
+                            break
+                        entry_url = entry.get("original_url")
+                        if entry_url:
+                            ydl.download([entry_url])
+                            self.current_video += 1
                 else:
-                    # Đây là một video đơn lẻ
-                    self.playlist_title = None
-
-                ydl.download([self.url])
+                    self.total_videos = 1
+                    self.progress.emit("Một video đơn")
+                    ydl.download([self.url])
 
             if not self.is_cancelled:
                 self.finished.emit()
@@ -87,54 +96,28 @@ class DownloaderThread(QThread):
     def progress_hook(self, d):
         if d["status"] == "downloading":
             percent = d["_percent_str"]
-            filename = d["filename"]
-            self.progress.emit(f"Đang tải: {filename} - {percent}")
+            filename = os.path.basename(d["filename"])
+
+            if self.total_videos > 1:
+                self.progress.emit(
+                    f"[{self.current_video + 1}/{self.total_videos}] Đang tải video: {percent} - {filename}"
+                )
+            else:
+                self.progress.emit(f"Đang tải video: {percent} - {filename}")
+
         elif d["status"] == "finished":
-            filename = d["filename"]
-            self.progress.emit(f"Đã tải xong: {filename}")
+            self.current_video += 1
+            filename = os.path.basename(d["filename"])
+            if self.total_videos > 1:
+                self.progress.emit(
+                    f"[{self.current_video}/{self.total_videos}] Đang chuyển đổi video sang audio: {filename}"
+                )
+            else:
+                self.progress.emit(f"Đang chuyển đổi video sang audio: {filename}")
 
     def cancel(self):
         self.is_cancelled = True
         self.terminate()
-
-
-class InstallationGuideDialog(QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("Hướng dẫn cài đặt ffmpeg")
-        self.setMinimumSize(400, 300)
-
-        layout = QVBoxLayout()
-
-        guide_text = """
-        Để cài đặt ffmpeg, hãy làm theo hướng dẫn dưới đây tùy theo hệ điều hành của bạn:
-
-        Windows:
-        - Sử dụng Chocolatey: choco install ffmpeg
-        - Hoặc tải xuống từ trang chủ ffmpeg và thêm vào PATH.
-
-        macOS:
-        - Sử dụng Homebrew: brew install ffmpeg
-
-        Linux (Ubuntu/Debian):
-        sudo apt update
-        sudo apt install ffmpeg
-
-        Linux (Fedora):
-        sudo dnf install ffmpeg
-
-        Sau khi cài đặt, hãy khởi động lại ứng dụng.
-        """
-
-        guide_browser = QTextBrowser()
-        guide_browser.setPlainText(guide_text)
-        layout.addWidget(guide_browser)
-
-        close_button = QPushButton("Đóng")
-        close_button.clicked.connect(self.close)
-        layout.addWidget(close_button)
-
-        self.setLayout(layout)
 
 
 class YouTubeDownloaderApp(QWidget):
@@ -150,7 +133,7 @@ class YouTubeDownloaderApp(QWidget):
 
     def initUI(self):
         self.setWindowTitle("Diu Túp downloader by Paul Pham 157")
-        self.setFixedSize(800, 200)
+        self.setFixedSize(900, 300)
 
         layout = QVBoxLayout()
 
@@ -279,13 +262,13 @@ class YouTubeDownloaderApp(QWidget):
         self.start_button.hide()
         self.pause_button.show()
         self.progress_bar.show()
-        self.set_status("Đang tải xuống...")
+        self.set_status("Đang quét thông tin các video...")
         self.is_paused = False
 
     def pause_download(self):
         if self.downloader and self.downloader.isRunning():
             self.downloader.cancel()
-            self.set_status("Đang chờ bạn nhấn tiếp tục đấy...")
+            self.set_status("Đang chờ anh nhấn tiếp tục đấy...")
             self.start_button.setEnabled(False)
             self.pause_button.hide()
             self.continue_button.show()
@@ -303,7 +286,7 @@ class YouTubeDownloaderApp(QWidget):
 
     def download_finished(self):
         self.set_status(
-            "Tải xong hết playlist rồi anh ạ, anh dán playlist khác vào để tải tiếp hoặc là thoát nếu đã xong"
+            "Tải xong hết rồi anh ạ, anh dán URL khác vào để tải tiếp hoặc là thoát nếu đã xong"
         )
         self.start_button.show()
         self.pause_button.hide()
