@@ -68,21 +68,31 @@ class DownloaderThread(QThread):
         }
 
         try:
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl_opts["extract_flat"] = True
+            ydls = yt_dlp.YoutubeDL(ydl_opts)
+            with ydls as ydl:
                 info = ydl.extract_info(self.url, download=False)
                 if "entries" in info:
-                    self.playlist_title = info.get("title", "Unknown Playlist")
+                    playlist_title = info.get("title", "Unknown Playlist Name")
+                    self.playlist_title = playlist_title
                     self.total_videos = len(info["entries"])
                     self.progress.emit(
-                        f"Playlist: {self.playlist_title} có {self.total_videos} video"
+                        f"{self.total_videos} video in playlist {self.playlist_title}"
                     )
                     for entry in info["entries"]:
                         if self.is_cancelled:
                             break
-                        entry_url = entry.get("original_url")
-                        if entry_url:
-                            ydl.download([entry_url])
-                            self.current_video += 1
+                        title = entry.get("title")
+                        views = entry.get("view_count")
+                        is_private = title == "[Private video]" or views == None
+                        if is_private:
+                            self.total_videos -= 1
+                            continue
+                        else:
+                            entry_url = entry.get("url")
+                            if entry_url:
+                                ydl.download([entry_url])
+                                self.current_video += 1
                 else:
                     self.total_videos = 1
                     self.progress.emit("Một video đơn")
