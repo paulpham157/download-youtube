@@ -58,9 +58,7 @@ class DownloaderThread(QThread):
                     "preferredquality": "192",
                 }
             ],
-            "outtmpl": os.path.join(
-                self.download_dir, "%(playlist_title)s", "%(title)s.%(ext)s"
-            ),
+            "outtmpl": os.path.join(self.download_dir, "%(title)s.%(ext)s"),
             "progress_hooks": [self.progress_hook],
             "ffmpeg_location": self.ffmpeg_path,
             "extract_flat": True,
@@ -94,6 +92,8 @@ class DownloaderThread(QThread):
                             if entry_url:
                                 ydl.download([entry_url])
                                 self.current_video += 1
+                                # Di chuyển file vừa tải đến thư mục playlist
+                                self.move_file_to_playlist(playlist_dir)
                 else:
                     self.total_videos = 1
                     self.progress.emit("Một video đơn")
@@ -103,6 +103,13 @@ class DownloaderThread(QThread):
                 self.finished.emit()
         except Exception as e:
             self.error.emit(str(e))
+
+    def move_file_to_playlist(self, destination_dir):
+        for file in os.listdir(self.download_dir):
+            if file.endswith(".mp3"):
+                source_path = os.path.join(self.download_dir, file)
+                destination_path = os.path.join(destination_dir, file)
+                shutil.move(source_path, destination_path)
 
     def progress_hook(self, d):
         if d["status"] == "downloading":
