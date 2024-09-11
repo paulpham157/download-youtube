@@ -73,13 +73,20 @@ class DownloaderThread(QThread):
                 if "entries" in info:
                     self.playlist_title = info.get("title", "Unknown Playlist")
                     self.total_videos = len(info["entries"])
-                    self.progress.emit(f"Playlist: {self.playlist_title}")
-                    self.progress.emit(f"Tổng số video: {self.total_videos}")
+                    self.progress.emit(
+                        f"Playlist: {self.playlist_title} có {self.total_videos} video"
+                    )
+                    for entry in info["entries"]:
+                        if self.is_cancelled:
+                            break
+                        entry_url = entry.get("original_url")
+                        if entry_url:
+                            ydl.download([entry_url])
+                            self.current_video += 1
                 else:
                     self.total_videos = 1
-                    self.progress.emit("Đang tải một video")
-
-                ydl.download([self.url])
+                    self.progress.emit("Một video đơn")
+                    ydl.download([self.url])
 
             if not self.is_cancelled:
                 self.finished.emit()
@@ -96,7 +103,7 @@ class DownloaderThread(QThread):
                     f"[{self.current_video + 1}/{self.total_videos}] Đang tải video: {percent} - {filename}"
                 )
             else:
-                self.progress.emit(f"Đang tải: {percent} - {filename}")
+                self.progress.emit(f"Đang tải video: {percent} - {filename}")
 
         elif d["status"] == "finished":
             self.current_video += 1
@@ -106,7 +113,7 @@ class DownloaderThread(QThread):
                     f"[{self.current_video}/{self.total_videos}] Đang chuyển đổi video sang audio: {filename}"
                 )
             else:
-                self.progress.emit(f"Hoàn thành tải xuống: {filename}")
+                self.progress.emit(f"Đang chuyển đổi video sang audio: {filename}")
 
     def cancel(self):
         self.is_cancelled = True
@@ -255,7 +262,7 @@ class YouTubeDownloaderApp(QWidget):
         self.start_button.hide()
         self.pause_button.show()
         self.progress_bar.show()
-        self.set_status("Đang chuẩn bị...")
+        self.set_status("Đang quét thông tin các video...")
         self.is_paused = False
 
     def pause_download(self):
