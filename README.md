@@ -8,6 +8,10 @@ This application allows users to download YouTube playlist videos as MP3 files.
 - Simple and intuitive graphical user interface
 - Cross-platform support (macOS and Windows)
 
+### If you are dev, wanna build, read below. If not, skip the contents below and download [lastest release](https://github.com/paul-pham-157/download-youtube/releases).
+
+### Donate me [HERE](https://www.paypal.com/paypalme/hungpham2302) ^^ thanks you very much <3
+
 ## Requirements
 
 - Python 3.10 or later
