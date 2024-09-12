@@ -147,7 +147,9 @@ class DownloaderThread(QThread):
                             ydl.download([entry_url])
                             self.move_file_to_playlist(playlist_dir)
             else:
-                self.total_videos, self.original_total_videos = 1
+                self.total_videos = 1
+                self.original_total_videos = 1
+                self.progress.emit("Một video đơn")
                 ydl.download([playlist_url])
                 self.move_file_to_playlist(self.single_list)
 
@@ -270,13 +272,6 @@ Chúng được chia vào các thư mục con tương ứng với tên của pla
         start_font.setBold(True)
         self.start_button.setFont(start_font)
 
-        start_palette = self.start_button.palette()
-        start_palette.setColor(QPalette.ColorRole.Button, QColor(0, 255, 0))
-        start_palette.setColor(QPalette.ColorRole.ButtonText, Qt.GlobalColor.white)
-        self.start_button.setPalette(start_palette)
-        self.start_button.setAutoFillBackground(True)
-        self.start_button.update()
-
         button_layout.addWidget(self.start_button)
 
         self.pause_button = QPushButton("Pause")
@@ -294,13 +289,6 @@ Chúng được chia vào các thư mục con tương ứng với tên của pla
         self.continue_button.setFont(continue_font)
 
         self.continue_button.setMinimumSize(150, 50)
-
-        palette = self.continue_button.palette()
-        palette.setColor(QPalette.ColorRole.Button, QColor(0, 128, 255))
-        palette.setColor(QPalette.ColorRole.ButtonText, Qt.GlobalColor.white)
-        self.continue_button.setPalette(palette)
-        self.continue_button.setAutoFillBackground(True)
-        self.continue_button.update()
 
         button_layout.addWidget(self.continue_button)
 
