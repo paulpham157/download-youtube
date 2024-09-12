@@ -104,6 +104,7 @@ class DownloaderThread(QThread):
                                 self.move_file_to_playlist(playlist_dir)
                 else:
                     self.total_videos = 1
+                    self.original_total_videos = 1
                     self.progress.emit("Một video đơn")
                     ydl.download([self.url])
                     self.move_file_to_playlist(self.single_list)
@@ -280,13 +281,12 @@ class YouTubeDownloaderApp(QWidget):
             return
 
         url = self.url_input.text().strip()
-        if not url:
-            self.set_status("Vui lòng nhập URL playlist YouTube hợp lệ")
+        if (not url) or ("youtube.com" not in url):
+            self.set_status("Vui lòng nhập URL YouTube hợp lệ")
             return
 
-        # Vô hiệu hóa input URL
         self.url_input.setEnabled(False)
-
+        self.clear_button.setEnabled(False)
         self.downloader = DownloaderThread(url, self.ffmpeg_path)
         self.downloader.progress.connect(self.update_progress)
         self.downloader.finished.connect(self.download_finished)
@@ -321,14 +321,21 @@ class YouTubeDownloaderApp(QWidget):
     def download_finished(self):
         total_videos = self.downloader.total_videos
         original_total_videos = self.downloader.original_total_videos
-        self.set_status(
-            f"Tải xong {total_videos} public video trên tổng số {original_total_videos} video rồi anh ạ\nCó {original_total_videos - total_videos} video private không tải được\nAnh dán URL khác vào để tải tiếp hoặc là thoát nếu đã xong"
-        )
+        private_videos = original_total_videos - total_videos
+        if private_videos > 0:
+            self.set_status(
+                f"Tải xong {total_videos} public video trên tổng số {original_total_videos} video rồi anh ạ\nCó {private_videos} video private không tải được\nAnh dán URL khác vào để tải tiếp hoặc là thoát nếu đã xong"
+            )
+        else:
+            self.set_status(
+                f"Tải xong {total_videos} public video trên tổng số {original_total_videos} video rồi anh ạ\nAnh dán URL khác vào để tải tiếp hoặc là thoát nếu đã xong"
+            )
         self.start_button.show()
         self.pause_button.hide()
         self.progress_bar.hide()
         self.is_paused = False
         self.url_input.setEnabled(True)
+        self.clear_button.setEnabled(True)
 
     def download_error(self, error_message):
         if "ffprobe and ffmpeg not found" in error_message:
