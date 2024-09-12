@@ -144,16 +144,12 @@ class DownloaderThread(QThread):
                     else:
                         entry_url = entry.get("url")
                         if entry_url:
-                            pass
-                            # ydl.download([entry_url])
-                            # self.move_file_to_playlist(playlist_dir)
+                            ydl.download([entry_url])
+                            self.move_file_to_playlist(playlist_dir)
             else:
-                self.total_videos = 1
-                self.original_total_videos = 1
-                self.progress.emit("Một video đơn")
-                pass
-                # ydl.download([playlist_url])
-                # self.move_file_to_playlist(self.single_list)
+                self.total_videos, self.original_total_videos = 1
+                ydl.download([playlist_url])
+                self.move_file_to_playlist(self.single_list)
 
     def move_file_to_playlist(self, destination_dir):
         for file in os.listdir(self.download_dir):
@@ -169,7 +165,7 @@ class DownloaderThread(QThread):
 
             if self.total_videos > 1:
                 self.progress.emit(
-                    f"[{self.current_video + 1}/{self.total_videos}] Đang tải video: {percent}\n{filename}"
+                    f"[{self.current_video + 1}/{self.total_videos}] videos đang tải: {percent}\n{filename}"
                 )
             else:
                 self.progress.emit(f"Đang tải video: {percent}\n{filename}")
@@ -179,7 +175,7 @@ class DownloaderThread(QThread):
             filename = os.path.basename(d["filename"])
             if self.total_videos > 1:
                 self.progress.emit(
-                    f"[{self.current_video}/{self.total_videos}] Đang chuyển đổi video sang audio:\n{filename}"
+                    f"[{self.current_video}/{self.total_videos}] videos đang chuyển đổi sang audio:\n{filename}"
                 )
             else:
                 self.progress.emit(f"Đang chuyển đổi video sang audio:\n{filename}")
