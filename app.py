@@ -18,7 +18,7 @@ from PyQt6.QtWidgets import (
     QTextEdit,
 )
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
-from PyQt6.QtGui import QFont, QColor, QPalette, QClipboard
+from PyQt6.QtGui import QFont, QColor, QPalette
 import yt_dlp
 import shutil
 
@@ -185,6 +185,17 @@ class DownloaderThread(QThread):
         self.terminate()
 
 
+instruction = f"""Anh dán địa chỉ URL vào input phía trên nhé!
+URL có thể dán là:
+
+- URL của 1 video đơn lẻ
+vd: https://www.youtube.com/watch?v=_yC7-iR6t3w&list=PLT1rvk7Trkw4nbIcS1czIII8UoioxkI8V
+- URL của 1 playlist các video
+vd: https://www.youtube.com/playlist?list=PLT1rvk7Trkw4nbIcS1czIII8UoioxkI8V
+- URL tổng hợp các playlists của 1 kênh
+vd: https://www.youtube.com/@CoComelon/playlists"""
+
+
 class YouTubeDownloaderApp(QWidget):
     def __init__(self):
         super().__init__()
@@ -198,15 +209,14 @@ class YouTubeDownloaderApp(QWidget):
 
     def initUI(self):
         self.setWindowTitle("Diu Túp downloader by Paul Pham 157")
-        self.setFixedSize(900, 450)
 
         layout = QVBoxLayout()
 
         self.download_location_label = QLabel(
-            f"Các file mp3 sẽ lưu tại: {self.download_dir}"
+            f"""Các file mp3 sẽ lưu tại: {self.download_dir}
+Chúng được chia vào các thư mục con tương ứng với tên của playlist hoặc Single nếu url là video đơn lẻ"""
         )
         self.download_location_label.setWordWrap(True)
-        self.download_location_label.setFixedHeight(40)
         layout.addWidget(self.download_location_label)
 
         url_layout = QHBoxLayout()
@@ -220,9 +230,10 @@ class YouTubeDownloaderApp(QWidget):
 
         layout.addLayout(url_layout)
 
-        self.status_label = QLabel("Ô kê, anh nhấn nút start là được...")
+        self.status_label = QLabel(instruction)
         self.status_label.setWordWrap(True)
         layout.addWidget(self.status_label)
+        self.url_input.textChanged.connect(self.check_url_input)
 
         self.playlist_progress_label = QLabel("")
         self.playlist_progress_label.setWordWrap(True)
@@ -309,6 +320,13 @@ class YouTubeDownloaderApp(QWidget):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
+    def check_url_input(self):
+        url = self.url_input.text().strip()
+        if url:
+            self.status_label.setText("Ô kê, anh nhấn nút start là được")
+        else:
+            self.status_label.setText(instruction)
+
     def find_ffmpeg(self):
         if getattr(sys, "frozen", False):
             base_path = sys._MEIPASS
@@ -377,9 +395,13 @@ class YouTubeDownloaderApp(QWidget):
             self.pause_button.show()
 
     def update_progress(self, message):
+        txt_playlist_progress = ""
         if self.downloader.playlists:
-            progress = f"[{self.downloader.current_playlist + 1}/{len(self.downloader.playlists)}] playlists"
-            self.playlist_progress_label.setText(progress)
+            txt_playlist_progress = f"[{self.downloader.current_playlist + 1}/{len(self.downloader.playlists)}]"
+        progress = (
+            f"Playlist: {txt_playlist_progress} {self.downloader.current_playlist_name}"
+        )
+        self.playlist_progress_label.setText(progress)
         self.set_status(message)
         self.logs_area.append(message)
 
@@ -389,21 +411,24 @@ class YouTubeDownloaderApp(QWidget):
         self.status_label.setText(new_status)
         self.logs_area.append(message)
 
+    # TODO: update hiển thị mess báo thành công khi tải xong cả kênh playlists
     def download_finished(self):
         total_videos = self.downloader.total_videos
         original_total_videos = self.downloader.original_total_videos
         private_videos = original_total_videos - total_videos
+        private_detached_message = ""
         if private_videos > 0:
-            self.set_status(
-                f"Tải xong {total_videos} public video trên tổng số {original_total_videos} video rồi anh ạ\nCó {private_videos} video private không tải được\nAnh dán URL khác vào để tải tiếp hoặc là thoát nếu đã xong"
+            private_detached_message = (
+                f"Có {private_videos} video private không tải được"
             )
-        else:
-            self.set_status(
-                f"Tải xong {total_videos} public video trên tổng số {original_total_videos} video rồi anh ạ\nAnh dán URL khác vào để tải tiếp hoặc là thoát nếu đã xong"
-            )
+        finished_message = f"""Tải xong {total_videos} / {original_total_videos} rồi anh ạ
+{private_detached_message}
+Anh dán URL khác vào để tải tiếp hoặc là thoát nếu đã xong"""
+        self.set_status(finished_message)
         self.start_button.show()
         self.pause_button.hide()
         self.progress_bar.hide()
+        self.playlist_progress_label.hide()
         self.is_paused = False
         self.url_input.setEnabled(True)
         self.clear_button.setEnabled(True)
