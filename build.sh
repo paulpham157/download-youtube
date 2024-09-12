@@ -15,6 +15,9 @@ else
 fi
 
 # Build the executable
-pyinstaller --name="YoutubeDownloaderByPaulPham157" --windowed --onefile --add-data "ffmpeg:." app.py
+# v1
+pyinstaller --name="YoutubeDownloaderByPaulPham157" --icon 'app.ico' --windowed --onefile --add-data "ffmpeg:." app.py
+# v2
+# pyinstaller app.spec
 
 echo "Build completed. The executable is in the 'dist' folder."
