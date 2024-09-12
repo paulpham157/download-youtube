@@ -15,10 +15,11 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
     QLabel,
     QPushButton,
+    QTextEdit,
 )
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtGui import QFont, QColor, QPalette, QClipboard
 import yt_dlp
-from PyQt6.QtGui import QFont, QColor, QPalette
 import shutil
 
 
@@ -161,7 +162,7 @@ class YouTubeDownloaderApp(QWidget):
 
     def initUI(self):
         self.setWindowTitle("Diu Túp downloader by Paul Pham 157")
-        self.setFixedSize(900, 300)
+        self.setFixedSize(900, 450)  # Increased height to accommodate new elements
 
         layout = QVBoxLayout()
 
@@ -188,6 +189,29 @@ class YouTubeDownloaderApp(QWidget):
         self.progress_bar.setRange(0, 0)
         self.progress_bar.hide()
         layout.addWidget(self.progress_bar)
+
+        # Thay đổi phần Logs area
+        logs_layout = QHBoxLayout()
+        self.logs_label = QLabel("Logs:")
+        logs_layout.addWidget(self.logs_label)
+
+        self.copy_button = QPushButton("Copy")
+        self.copy_button.clicked.connect(self.copy_logs)
+        self.copy_button.setFixedWidth(80)  # Giảm độ rộng của nút Copy
+        logs_layout.addWidget(self.copy_button)
+        logs_layout.addStretch()  # Thêm khoảng trống để đẩy nút Copy sang bên phải
+
+        layout.addLayout(logs_layout)
+
+        self.logs_area = QTextEdit()
+        self.logs_area.setReadOnly(True)
+        self.logs_area.setFixedHeight(100)  # Height for 5 lines of text
+        layout.addWidget(self.logs_area)
+
+        # Xóa phần cũ của nút Copy
+        # self.copy_button = QPushButton("Copy")
+        # self.copy_button.clicked.connect(self.copy_logs)
+        # layout.addWidget(self.copy_button)
 
         button_layout = QHBoxLayout()
         self.start_button = QPushButton("START")
@@ -317,6 +341,7 @@ class YouTubeDownloaderApp(QWidget):
 
     def update_progress(self, message):
         self.set_status(message)
+        self.logs_area.append(message)  # Add message to logs area
 
     def download_finished(self):
         total_videos = self.downloader.total_videos
@@ -356,9 +381,15 @@ class YouTubeDownloaderApp(QWidget):
 
     def set_status(self, message):
         self.status_label.setText(f"Trạng thái:\n{message}")
+        self.logs_area.append(message)  # Add message to logs area
 
     def clear_url(self):
         self.url_input.clear()
+
+    def copy_logs(self):
+        clipboard = QApplication.clipboard()
+        clipboard.setText(self.logs_area.toPlainText())
+        QMessageBox.information(self, "Thông báo", "Đã sao chép logs vào clipboard!")
 
 
 if __name__ == "__main__":
