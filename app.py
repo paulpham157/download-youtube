@@ -122,9 +122,6 @@ class DownloaderThread(QThread):
             if "entries" in info:
                 self.playlist_title = info.get("title", "Unknown Playlist Name")
                 self.current_playlist_name = self.playlist_title
-                self.playlist_progress.emit(
-                    f"Đang tải playlist: {self.current_playlist_name}"
-                )
                 self.original_total_videos = len(info["entries"])
                 self.total_videos = self.original_total_videos
                 self.progress.emit(
@@ -384,11 +381,11 @@ class YouTubeDownloaderApp(QWidget):
             self.pause_button.show()
 
     def update_progress(self, message):
+        if self.downloader.playlists:
+            progress = f"[{self.downloader.current_playlist + 1}/{len(self.downloader.playlists)}] playlists"
+            self.playlist_progress_label.setText(progress)
         self.set_status(message)
         self.logs_area.append(message)
-        if self.downloader.playlists:
-            progress = f"Đang tải playlist {self.downloader.current_playlist + 1}/{len(self.downloader.playlists)}"
-            self.playlist_progress_label.setText(progress)
 
     def update_playlist_progress(self, message):
         current_status = self.status_label.text()
@@ -438,11 +435,7 @@ class YouTubeDownloaderApp(QWidget):
             if "\n" in self.status_label.text()
             else ""
         )
-        new_status = (
-            f"{current_playlist_progress}\nTrạng thái:\n{message}"
-            if current_playlist_progress
-            else f"Trạng thái:\n{message}"
-        )
+        new_status = f"{current_playlist_progress}\n{message}"
         self.status_label.setText(new_status)
         self.logs_area.append(message)
 
@@ -459,6 +452,4 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     ex = YouTubeDownloaderApp()
     ex.show()
-    sys.exit(app.exec())
-
     sys.exit(app.exec())
