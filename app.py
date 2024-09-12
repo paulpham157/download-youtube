@@ -162,9 +162,17 @@ class YouTubeDownloaderApp(QWidget):
 
     def initUI(self):
         self.setWindowTitle("Diu Túp downloader by Paul Pham 157")
-        self.setFixedSize(900, 450)  # Increased height to accommodate new elements
+        self.setFixedSize(900, 450)
 
         layout = QVBoxLayout()
+
+        # Di chuyển dòng chữ "Các file mp3 sẽ lưu tại..." lên trên cùng
+        self.download_location_label = QLabel(
+            f"Các file mp3 sẽ lưu tại: {self.download_dir}"
+        )
+        self.download_location_label.setWordWrap(True)  # Cho phép xuống dòng
+        self.download_location_label.setFixedHeight(40)  # Điều chỉnh chiều cao
+        layout.addWidget(self.download_location_label)
 
         url_layout = QHBoxLayout()
         self.url_input = QLineEdit()
@@ -180,10 +188,9 @@ class YouTubeDownloaderApp(QWidget):
         self.status_label = QLabel("Ô kê, anh nhấn nút start là được...")
         layout.addWidget(self.status_label)
 
-        self.download_location_label = QLabel(
-            f"Các file mp3 sẽ lưu tại: {self.download_dir}"
-        )
-        layout.addWidget(self.download_location_label)
+        # Xóa dòng này vì đã di chuyển lên trên
+        # self.download_location_label = QLabel(f"Các file mp3 sẽ lưu tại: {self.download_dir}")
+        # layout.addWidget(self.download_location_label)
 
         self.progress_bar = QProgressBar()
         self.progress_bar.setRange(0, 0)
