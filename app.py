@@ -169,6 +169,10 @@ class YouTubeDownloaderApp(QWidget):
         self.url_input.setPlaceholderText("Địa chỉ URL")
         url_layout.addWidget(self.url_input)
 
+        self.clear_button = QPushButton("Clear")
+        self.clear_button.clicked.connect(self.clear_url)
+        url_layout.addWidget(self.clear_button)
+
         layout.addLayout(url_layout)
 
         self.status_label = QLabel("Ô kê, anh nhấn nút start là được...")
@@ -345,6 +349,9 @@ class YouTubeDownloaderApp(QWidget):
 
     def set_status(self, message):
         self.status_label.setText(f"Trạng thái:\n{message}")
+
+    def clear_url(self):
+        self.url_input.clear()
 
 
 if __name__ == "__main__":
