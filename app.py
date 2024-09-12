@@ -62,6 +62,7 @@ def get_channel_playlists(channel_url):
 
 class DownloaderThread(QThread):
     progress = pyqtSignal(str)
+    playlist_progress = pyqtSignal(str)
     finished = pyqtSignal()
     error = pyqtSignal(str)
 
@@ -78,6 +79,7 @@ class DownloaderThread(QThread):
         self.current_video = 0
         self.playlists = []
         self.current_playlist = 0
+        self.current_playlist_name = ""
 
     def run(self):
         try:
@@ -119,6 +121,10 @@ class DownloaderThread(QThread):
             info = ydl.extract_info(playlist_url, download=False)
             if "entries" in info:
                 self.playlist_title = info.get("title", "Unknown Playlist Name")
+                self.current_playlist_name = self.playlist_title
+                self.playlist_progress.emit(
+                    f"Đang tải playlist: {self.current_playlist_name}"
+                )
                 self.original_total_videos = len(info["entries"])
                 self.total_videos = self.original_total_videos
                 self.progress.emit(
@@ -141,14 +147,16 @@ class DownloaderThread(QThread):
                     else:
                         entry_url = entry.get("url")
                         if entry_url:
-                            ydl.download([entry_url])
-                            self.move_file_to_playlist(playlist_dir)
+                            pass
+                            # ydl.download([entry_url])
+                            # self.move_file_to_playlist(playlist_dir)
             else:
                 self.total_videos = 1
                 self.original_total_videos = 1
                 self.progress.emit("Một video đơn")
-                ydl.download([playlist_url])
-                self.move_file_to_playlist(self.single_list)
+                pass
+                # ydl.download([playlist_url])
+                # self.move_file_to_playlist(self.single_list)
 
     def move_file_to_playlist(self, destination_dir):
         for file in os.listdir(self.download_dir):
@@ -201,12 +209,11 @@ class YouTubeDownloaderApp(QWidget):
 
         layout = QVBoxLayout()
 
-        # Di chuyển dòng chữ "Các file mp3 sẽ lưu tại..." lên trên cùng
         self.download_location_label = QLabel(
             f"Các file mp3 sẽ lưu tại: {self.download_dir}"
         )
-        self.download_location_label.setWordWrap(True)  # Cho phép xuống dòng
-        self.download_location_label.setFixedHeight(40)  # Điều chỉnh chiều cao
+        self.download_location_label.setWordWrap(True)
+        self.download_location_label.setFixedHeight(40)
         layout.addWidget(self.download_location_label)
 
         url_layout = QHBoxLayout()
@@ -221,39 +228,34 @@ class YouTubeDownloaderApp(QWidget):
         layout.addLayout(url_layout)
 
         self.status_label = QLabel("Ô kê, anh nhấn nút start là được...")
+        self.status_label.setWordWrap(True)
         layout.addWidget(self.status_label)
 
-        # Xóa dòng này vì đã di chuyển lên trên
-        # self.download_location_label = QLabel(f"Các file mp3 sẽ lưu tại: {self.download_dir}")
-        # layout.addWidget(self.download_location_label)
+        self.playlist_progress_label = QLabel("")
+        self.playlist_progress_label.setWordWrap(True)
+        layout.addWidget(self.playlist_progress_label)
 
         self.progress_bar = QProgressBar()
         self.progress_bar.setRange(0, 0)
         self.progress_bar.hide()
         layout.addWidget(self.progress_bar)
 
-        # Thay đổi phần Logs area
         logs_layout = QHBoxLayout()
         self.logs_label = QLabel("Logs:")
         logs_layout.addWidget(self.logs_label)
 
         self.copy_button = QPushButton("Copy")
         self.copy_button.clicked.connect(self.copy_logs)
-        self.copy_button.setFixedWidth(80)  # Giảm độ rộng của nút Copy
+        self.copy_button.setFixedWidth(80)
         logs_layout.addWidget(self.copy_button)
-        logs_layout.addStretch()  # Thêm khoảng trống để đẩy nút Copy sang bên phải
+        logs_layout.addStretch()
 
         layout.addLayout(logs_layout)
 
         self.logs_area = QTextEdit()
         self.logs_area.setReadOnly(True)
-        self.logs_area.setFixedHeight(100)  # Height for 5 lines of text
+        self.logs_area.setFixedHeight(100)
         layout.addWidget(self.logs_area)
-
-        # Xóa phần cũ của nút Copy
-        # self.copy_button = QPushButton("Copy")
-        # self.copy_button.clicked.connect(self.copy_logs)
-        # layout.addWidget(self.copy_button)
 
         button_layout = QHBoxLayout()
         self.start_button = QPushButton("START")
@@ -304,9 +306,6 @@ class YouTubeDownloaderApp(QWidget):
 
         layout.addLayout(button_layout)
 
-        self.playlist_progress_label = QLabel("")
-        layout.addWidget(self.playlist_progress_label)
-
         self.setLayout(layout)
 
     def center(self):
@@ -319,10 +318,8 @@ class YouTubeDownloaderApp(QWidget):
 
     def find_ffmpeg(self):
         if getattr(sys, "frozen", False):
-            # Nếu đang chạy từ file thực thi đã được đóng gói
             base_path = sys._MEIPASS
         else:
-            # Nếu đang chạy từ script
             base_path = os.path.dirname(os.path.abspath(__file__))
 
         ffmpeg_path = os.path.join(base_path, "ffmpeg")
@@ -358,6 +355,7 @@ class YouTubeDownloaderApp(QWidget):
         self.clear_button.setEnabled(False)
         self.downloader = DownloaderThread(url, self.ffmpeg_path)
         self.downloader.progress.connect(self.update_progress)
+        self.downloader.playlist_progress.connect(self.update_playlist_progress)
         self.downloader.finished.connect(self.download_finished)
         self.downloader.error.connect(self.download_error)
 
@@ -392,6 +390,12 @@ class YouTubeDownloaderApp(QWidget):
             progress = f"Đang tải playlist {self.downloader.current_playlist + 1}/{len(self.downloader.playlists)}"
             self.playlist_progress_label.setText(progress)
 
+    def update_playlist_progress(self, message):
+        current_status = self.status_label.text()
+        new_status = f"{message}\n{current_status}"
+        self.status_label.setText(new_status)
+        self.logs_area.append(message)
+
     def download_finished(self):
         total_videos = self.downloader.total_videos
         original_total_videos = self.downloader.original_total_videos
@@ -422,15 +426,25 @@ class YouTubeDownloaderApp(QWidget):
             )
         else:
             self.set_status(f"Lỗi: {error_message}")
-        self.start_button.show()  # Hiển thị lại nút Start
-        self.pause_button.hide()  # Ẩn nút Pause
+        self.start_button.show()
+        self.pause_button.hide()
         self.progress_bar.hide()
         self.is_paused = False
         self.url_input.setEnabled(True)
 
     def set_status(self, message):
-        self.status_label.setText(f"Trạng thái:\n{message}")
-        self.logs_area.append(message)  # Add message to logs area
+        current_playlist_progress = (
+            self.status_label.text().split("\n")[0]
+            if "\n" in self.status_label.text()
+            else ""
+        )
+        new_status = (
+            f"{current_playlist_progress}\nTrạng thái:\n{message}"
+            if current_playlist_progress
+            else f"Trạng thái:\n{message}"
+        )
+        self.status_label.setText(new_status)
+        self.logs_area.append(message)
 
     def clear_url(self):
         self.url_input.clear()
@@ -445,4 +459,6 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     ex = YouTubeDownloaderApp()
     ex.show()
+    sys.exit(app.exec())
+
     sys.exit(app.exec())
