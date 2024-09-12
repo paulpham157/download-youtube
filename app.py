@@ -280,6 +280,9 @@ class YouTubeDownloaderApp(QWidget):
             self.set_status("Vui lòng nhập URL playlist YouTube hợp lệ")
             return
 
+        # Vô hiệu hóa input URL
+        self.url_input.setEnabled(False)
+
         self.downloader = DownloaderThread(url, self.ffmpeg_path)
         self.downloader.progress.connect(self.update_progress)
         self.downloader.finished.connect(self.download_finished)
@@ -301,9 +304,11 @@ class YouTubeDownloaderApp(QWidget):
             self.continue_button.show()
             self.progress_bar.hide()
             self.is_paused = True
+            self.url_input.setEnabled(True)  # Cho phép chỉnh sửa URL khi tạm dừng
 
     def continue_download(self):
         if self.is_paused:
+            self.url_input.setEnabled(False)  # Vô hiệu hóa input URL khi tiếp tục
             self.start_download()
             self.continue_button.hide()
             self.pause_button.show()
@@ -321,6 +326,7 @@ class YouTubeDownloaderApp(QWidget):
         self.pause_button.hide()
         self.progress_bar.hide()
         self.is_paused = False
+        self.url_input.setEnabled(True)  # Cho phép chỉnh sửa URL sau khi tải xong
 
     def download_error(self, error_message):
         if "ffprobe and ffmpeg not found" in error_message:
@@ -337,6 +343,7 @@ class YouTubeDownloaderApp(QWidget):
         self.pause_button.hide()  # Ẩn nút Pause
         self.progress_bar.hide()
         self.is_paused = False
+        self.url_input.setEnabled(True)  # Cho phép chỉnh sửa URL sau khi gặp lỗi
 
     def set_status(self, message):
         self.status_label.setText(f"Trạng thái:\n{message}")
