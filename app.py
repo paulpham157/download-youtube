@@ -41,6 +41,25 @@ def get_single_dir():
     return str(single_dir)
 
 
+def get_channel_playlists(channel_url):
+    ydl_opts = {
+        "extract_flat": True,
+        "skip_download": True,
+    }
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(channel_url, download=False)
+        playlists = []
+        for entry in info["entries"]:
+            if entry["_type"] == "url":
+                playlists.append(
+                    {
+                        "title": entry["title"],
+                        "url": entry["url"],
+                    }
+                )
+    return playlists
+
+
 class DownloaderThread(QThread):
     progress = pyqtSignal(str)
     finished = pyqtSignal()
@@ -57,8 +76,30 @@ class DownloaderThread(QThread):
         self.ffmpeg_path = ffmpeg_path
         self.total_videos = 0
         self.current_video = 0
+        self.playlists = []
+        self.current_playlist = 0
 
     def run(self):
+        try:
+            if "/playlists" in self.url:
+                self.playlists = get_channel_playlists(self.url)
+                self.progress.emit(
+                    f"Tìm thấy {len(self.playlists)} playlist trong kênh"
+                )
+                for playlist in self.playlists:
+                    if self.is_cancelled:
+                        break
+                    self.download_playlist(playlist["url"])
+                    self.current_playlist += 1
+            else:
+                self.download_playlist(self.url)
+
+            if not self.is_cancelled:
+                self.finished.emit()
+        except Exception as e:
+            self.error.emit(str(e))
+
+    def download_playlist(self, playlist_url):
         ydl_opts = {
             "format": "bestaudio/best",
             "postprocessors": [
@@ -74,46 +115,40 @@ class DownloaderThread(QThread):
             "extract_flat": True,
         }
 
-        try:
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(self.url, download=False)
-                if "entries" in info:
-                    self.playlist_title = info.get("title", "Unknown Playlist Name")
-                    self.original_total_videos = len(info["entries"])
-                    self.total_videos = self.original_total_videos
-                    self.progress.emit(
-                        f"Tìm thấy {self.total_videos} video trong playlist {self.playlist_title}\nĐang lọc các video private"
-                    )
-                    playlist_dir = os.path.join(self.download_dir, self.playlist_title)
-                    os.makedirs(playlist_dir, exist_ok=True)
-                    for entry in info["entries"]:
-                        if self.is_cancelled:
-                            break
-                        title = entry.get("title")
-                        views = entry.get("view_count")
-                        is_private = title == "[Private video]" or views is None
-                        if is_private:
-                            self.total_videos -= 1
-                            self.progress.emit(
-                                f"Có 1 video private, còn lại {self.total_videos} video, tiếp tục quét"
-                            )
-                            continue
-                        else:
-                            entry_url = entry.get("url")
-                            if entry_url:
-                                ydl.download([entry_url])
-                                self.move_file_to_playlist(playlist_dir)
-                else:
-                    self.total_videos = 1
-                    self.original_total_videos = 1
-                    self.progress.emit("Một video đơn")
-                    ydl.download([self.url])
-                    self.move_file_to_playlist(self.single_list)
-
-            if not self.is_cancelled:
-                self.finished.emit()
-        except Exception as e:
-            self.error.emit(str(e))
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(playlist_url, download=False)
+            if "entries" in info:
+                self.playlist_title = info.get("title", "Unknown Playlist Name")
+                self.original_total_videos = len(info["entries"])
+                self.total_videos = self.original_total_videos
+                self.progress.emit(
+                    f"Tìm thấy {self.total_videos} video trong playlist {self.playlist_title}\nĐang lọc các video private"
+                )
+                playlist_dir = os.path.join(self.download_dir, self.playlist_title)
+                os.makedirs(playlist_dir, exist_ok=True)
+                for entry in info["entries"]:
+                    if self.is_cancelled:
+                        break
+                    title = entry.get("title")
+                    views = entry.get("view_count")
+                    is_private = title == "[Private video]" or views is None
+                    if is_private:
+                        self.total_videos -= 1
+                        self.progress.emit(
+                            f"Có 1 video private, còn lại {self.total_videos} video, tiếp tục quét"
+                        )
+                        continue
+                    else:
+                        entry_url = entry.get("url")
+                        if entry_url:
+                            ydl.download([entry_url])
+                            self.move_file_to_playlist(playlist_dir)
+            else:
+                self.total_videos = 1
+                self.original_total_videos = 1
+                self.progress.emit("Một video đơn")
+                ydl.download([playlist_url])
+                self.move_file_to_playlist(self.single_list)
 
     def move_file_to_playlist(self, destination_dir):
         for file in os.listdir(self.download_dir):
@@ -269,6 +304,9 @@ class YouTubeDownloaderApp(QWidget):
 
         layout.addLayout(button_layout)
 
+        self.playlist_progress_label = QLabel("")
+        layout.addWidget(self.playlist_progress_label)
+
         self.setLayout(layout)
 
     def center(self):
@@ -327,6 +365,7 @@ class YouTubeDownloaderApp(QWidget):
         self.start_button.hide()
         self.pause_button.show()
         self.progress_bar.show()
+        self.playlist_progress_label.show()
         self.set_status("Đang quét thông tin các video...")
         self.is_paused = False
 
@@ -348,7 +387,10 @@ class YouTubeDownloaderApp(QWidget):
 
     def update_progress(self, message):
         self.set_status(message)
-        self.logs_area.append(message)  # Add message to logs area
+        self.logs_area.append(message)
+        if self.downloader.playlists:
+            progress = f"Đang tải playlist {self.downloader.current_playlist + 1}/{len(self.downloader.playlists)}"
+            self.playlist_progress_label.setText(progress)
 
     def download_finished(self):
         total_videos = self.downloader.total_videos
