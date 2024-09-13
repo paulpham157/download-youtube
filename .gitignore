@@ -165,3 +165,5 @@ ffmpeg
 ffmpeg.exe
 ffmpeg.zip
 ffmpeg.gz
+.zed
+pyrightconfig.json
