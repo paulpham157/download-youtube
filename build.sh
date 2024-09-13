@@ -6,7 +6,7 @@ pip install -r requirements.txt
 # Download ffmpeg
 if [ ! -f "ffmpeg" ]; then
     echo "Đang tải ffmpeg..."
-    curl -L https://evermeet.cx/ffmpeg/ffmpeg-6.0.zip -o ffmpeg.zip
+    curl -L https://evermeet.cx/ffmpeg/ffmpeg-7.0.2.zip -o ffmpeg.zip
     unzip ffmpeg.zip
     rm ffmpeg.zip
     echo "Đã tải xong ffmpeg"
