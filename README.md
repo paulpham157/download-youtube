@@ -14,6 +14,8 @@ Choose language:
 <span style="margin-left: 5px; vertical-align: middle;">English</span>
 </a>
 </div>
----
 
-^^
+| Ngôn ngữ   | Liên kết                                                     |
+| ---------- | ------------------------------------------------------------ |
+| Tiếng Việt | [Xem tài liệu bằng Tiếng Việt](docs/locale/vi/README.vi.md)  |
+| English    | [View documentation in English](docs/locale/en/README.en.md) |

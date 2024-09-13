@@ -1,6 +1,6 @@
 # YouTube Downloader
 
-[English](README.md) | [Tiếng Việt](README.vi.md)
+[Switch language](/README.md)
 
 This application allows users to download YouTube playlist videos as MP3 files.
 
