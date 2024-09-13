@@ -12,18 +12,15 @@ from PyQt6.QtWidgets import (
     QLabel,
     QProgressBar,
     QMessageBox,
-    QVBoxLayout,
-    QLabel,
-    QPushButton,
     QTextEdit,
 )
-from PyQt6.QtCore import Qt, QThread, pyqtSignal
-from PyQt6.QtGui import QFont, QColor, QPalette
+from PyQt6.QtCore import QThread, pyqtSignal
+from PyQt6.QtGui import QFont
 import yt_dlp
 import shutil
 
 
-instruction = f"""Anh dán địa chỉ URL vào input phía trên nhé!
+instruction = """Anh dán địa chỉ URL vào input phía trên nhé!
 URL có thể dán là:
 
 - URL của 1 video đơn lẻ
@@ -60,14 +57,15 @@ def get_channel_playlists(channel_url):
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(channel_url, download=False)
         playlists = []
-        for entry in info["entries"]:
-            if entry["_type"] == "url":
-                playlists.append(
-                    {
-                        "title": entry["title"],
-                        "url": entry["url"],
-                    }
-                )
+        if info is not None:
+            for entry in info["entries"]:
+                if entry["_type"] == "url":
+                    playlists.append(
+                        {
+                            "title": entry["title"],
+                            "url": entry["url"],
+                        }
+                    )
     return playlists
 
 
@@ -130,39 +128,40 @@ class DownloaderThread(QThread):
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(playlist_url, download=False)
-            if "entries" in info:
-                self.playlist_title = info.get("title", "Unknown Playlist Name")
-                self.current_playlist_name = self.playlist_title
-                self.original_total_videos = len(info["entries"])
-                self.total_videos = self.original_total_videos
-                self.progress.emit(
-                    f"Tìm thấy {self.total_videos} video trong playlist {self.playlist_title}\nĐang lọc các video private"
-                )
-                playlist_dir = os.path.join(self.download_dir, self.playlist_title)
-                os.makedirs(playlist_dir, exist_ok=True)
-                for entry in info["entries"]:
-                    if self.is_cancelled:
-                        break
-                    title = entry.get("title")
-                    views = entry.get("view_count")
-                    is_private = title == "[Private video]" or views is None
-                    if is_private:
-                        self.total_videos -= 1
-                        self.progress.emit(
-                            f"Có 1 video private, còn lại {self.total_videos} video, tiếp tục quét"
-                        )
-                        continue
-                    else:
-                        entry_url = entry.get("url")
-                        if entry_url:
-                            ydl.download([entry_url])
-                            self.move_file_to_playlist(playlist_dir)
-            else:
-                self.total_videos = 1
-                self.original_total_videos = 1
-                self.progress.emit("Một video đơn")
-                ydl.download([playlist_url])
-                self.move_file_to_playlist(self.single_list)
+            if info is not None:
+                if "entries" in info:
+                    self.playlist_title = info.get("title", "Unknown Playlist Name")
+                    self.current_playlist_name = self.playlist_title
+                    self.original_total_videos = len(info["entries"])
+                    self.total_videos = self.original_total_videos
+                    self.progress.emit(
+                        f"Tìm thấy {self.total_videos} video trong playlist {self.playlist_title}\nĐang lọc các video private"
+                    )
+                    playlist_dir = os.path.join(self.download_dir, self.playlist_title)
+                    os.makedirs(playlist_dir, exist_ok=True)
+                    for entry in info["entries"]:
+                        if self.is_cancelled:
+                            break
+                        title = entry.get("title")
+                        views = entry.get("view_count")
+                        is_private = title == "[Private video]" or views is None
+                        if is_private:
+                            self.total_videos -= 1
+                            self.progress.emit(
+                                f"Có 1 video private, còn lại {self.total_videos} video, tiếp tục quét"
+                            )
+                            continue
+                        else:
+                            entry_url = entry.get("url")
+                            if entry_url:
+                                ydl.download([entry_url])
+                                self.move_file_to_playlist(playlist_dir)
+                else:
+                    self.total_videos = 1
+                    self.original_total_videos = 1
+                    self.progress.emit("Một video đơn")
+                    ydl.download([playlist_url])
+                    self.move_file_to_playlist(self.single_list)
 
     def move_file_to_playlist(self, destination_dir):
         for file in os.listdir(self.download_dir):
@@ -303,10 +302,11 @@ Chúng được chia vào các thư mục con tương ứng với tên của pla
     def center(self):
         qr = self.frameGeometry()
         screen = QApplication.primaryScreen()
-        screen_geometry = screen.geometry()
-        cp = screen_geometry.center()
-        qr.moveCenter(cp)
-        self.move(qr.topLeft())
+        if screen is not None:
+            screen_geometry = screen.geometry()
+            cp = screen_geometry.center()
+            qr.moveCenter(cp)
+            self.move(qr.topLeft())
 
     def check_url_input(self):
         url = self.url_input.text().strip()
@@ -317,7 +317,7 @@ Chúng được chia vào các thư mục con tương ứng với tên của pla
 
     def find_ffmpeg(self):
         if getattr(sys, "frozen", False):
-            base_path = sys._MEIPASS
+            base_path = sys._MEIPASS # pyright: ignore
         else:
             base_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -384,14 +384,15 @@ Chúng được chia vào các thư mục con tương ứng với tên của pla
 
     def update_progress(self, message):
         txt_playlist_progress = ""
-        if self.downloader.playlists:
-            txt_playlist_progress = f"[{self.downloader.current_playlist + 1}/{len(self.downloader.playlists)}]"
-        progress = (
-            f"Playlist: {txt_playlist_progress} {self.downloader.current_playlist_name}"
-        )
-        self.playlist_progress_label.setText(progress)
-        self.set_status(message)
-        self.logs_area.append(message)
+        if self.downloader is not None:
+            if self.downloader.playlists:
+                txt_playlist_progress = f"[{self.downloader.current_playlist + 1}/{len(self.downloader.playlists)}]"
+            progress = (
+                f"Playlist: {txt_playlist_progress} {self.downloader.current_playlist_name}"
+            )
+            self.playlist_progress_label.setText(progress)
+            self.set_status(message)
+            self.logs_area.append(message)
 
     def update_playlist_progress(self, message):
         current_status = self.status_label.text()
@@ -401,25 +402,26 @@ Chúng được chia vào các thư mục con tương ứng với tên của pla
 
     # TODO: update hiển thị mess báo thành công khi tải xong cả kênh playlists
     def download_finished(self):
-        total_videos = self.downloader.total_videos
-        original_total_videos = self.downloader.original_total_videos
-        private_videos = original_total_videos - total_videos
-        private_detached_message = ""
-        if private_videos > 0:
-            private_detached_message = (
-                f"Có {private_videos} video private không tải được"
-            )
-        finished_message = f"""Tải xong {total_videos} / {original_total_videos} rồi anh ạ
-{private_detached_message}
-Anh dán URL khác vào để tải tiếp hoặc là thoát nếu đã xong"""
-        self.set_status(finished_message)
-        self.start_button.show()
-        self.pause_button.hide()
-        self.progress_bar.hide()
-        self.playlist_progress_label.hide()
-        self.is_paused = False
-        self.url_input.setEnabled(True)
-        self.clear_button.setEnabled(True)
+        if self.downloader is not None:
+            total_videos = self.downloader.total_videos
+            original_total_videos = self.downloader.original_total_videos
+            private_videos = original_total_videos - total_videos
+            private_detached_message = ""
+            if private_videos > 0:
+                private_detached_message = (
+                    f"Có {private_videos} video private không tải được"
+                )
+            finished_message = f"""Tải xong {total_videos} / {original_total_videos} rồi anh ạ
+    {private_detached_message}
+    Anh dán URL khác vào để tải tiếp hoặc là thoát nếu đã xong"""
+            self.set_status(finished_message)
+            self.start_button.show()
+            self.pause_button.hide()
+            self.progress_bar.hide()
+            self.playlist_progress_label.hide()
+            self.is_paused = False
+            self.url_input.setEnabled(True)
+            self.clear_button.setEnabled(True)
 
     def download_error(self, error_message):
         if "ffprobe and ffmpeg not found" in error_message:
@@ -453,8 +455,9 @@ Anh dán URL khác vào để tải tiếp hoặc là thoát nếu đã xong"""
 
     def copy_logs(self):
         clipboard = QApplication.clipboard()
-        clipboard.setText(self.logs_area.toPlainText())
-        QMessageBox.information(self, "Thông báo", "Đã sao chép logs vào clipboard!")
+        if clipboard is not None:
+            clipboard.setText(self.logs_area.toPlainText())
+            QMessageBox.information(self, "Thông báo", "Đã sao chép logs vào clipboard!")
 
 
 if __name__ == "__main__":
