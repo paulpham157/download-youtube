@@ -3,6 +3,15 @@ from ...Messages import Messages
 
 en_messages = Messages()
 # ------------------------------------------------------------------------------------------------------#
+# Start Class SplashScreen
+en_messages.splash_screen_title = "Starting up"
+en_messages.loading_app = "Opening application..."
+en_messages.switch_language = "Switch language"
+en_messages.open_app = "Open application"
+en_messages.ready_to_start = "Ready to start!"
+# End Class SplashScreen
+# ------------------------------------------------------------------------------------------------------#
+# ------------------------------------------------------------------------------------------------------#
 # Start Class DiuTupDownloaderApp
 en_messages.app_name = "YouTube downloader by Paul Pham 157"
 en_messages.download_location_label = (

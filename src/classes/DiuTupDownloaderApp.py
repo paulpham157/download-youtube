@@ -16,44 +16,46 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtGui import QFont
 from .Utils import Utils
 from .DownloaderThread import DownloaderThread
-from .languages import get_messages
-
-messages = get_messages(lang="vi")
 
 
 class DiuTupDownloaderApp(QWidget):
-    def __init__(self):
+    def __init__(self, messages):
         super().__init__()
-        self.download_dir = Utils.get_download_dir()
+        self.messages = messages
+        self.download_dir = str(Utils.get_download_dir())
         self.ffmpeg_path = self.find_ffmpeg()
         self.initUI()
         self.downloader = None
         self.is_paused = False
         self.center()
 
+    def check_dependencies(self):
+        self.ffmpeg_path = self.find_ffmpeg()
+        return True
+
     def initUI(self):
-        self.setWindowTitle(messages.app_name)
+        self.setWindowTitle(self.messages.app_name)
 
         layout = QVBoxLayout()
 
         self.download_location_label = QLabel(
-            messages.download_location_label(self.download_dir)
+            self.messages.download_location_label(self.download_dir)
         )
         self.download_location_label.setWordWrap(True)
         layout.addWidget(self.download_location_label)
 
         url_layout = QHBoxLayout()
         self.url_input = QLineEdit()
-        self.url_input.setPlaceholderText(messages.placeholder_url)
+        self.url_input.setPlaceholderText(self.messages.placeholder_url)
         url_layout.addWidget(self.url_input)
 
-        self.clear_button = QPushButton(messages.clear_button)
+        self.clear_button = QPushButton(self.messages.clear_button)
         self.clear_button.clicked.connect(self.clear_url)
         url_layout.addWidget(self.clear_button)
 
         layout.addLayout(url_layout)
 
-        self.status_label = QLabel(messages.instruction)
+        self.status_label = QLabel(self.messages.instruction)
         self.status_label.setWordWrap(True)
         layout.addWidget(self.status_label)
         self.url_input.textChanged.connect(self.check_url_input)
@@ -68,10 +70,10 @@ class DiuTupDownloaderApp(QWidget):
         layout.addWidget(self.progress_bar)
 
         logs_layout = QHBoxLayout()
-        self.logs_label = QLabel(messages.logs_label)
+        self.logs_label = QLabel(self.messages.logs_label)
         logs_layout.addWidget(self.logs_label)
 
-        self.copy_button = QPushButton(messages.copy_button)
+        self.copy_button = QPushButton(self.messages.copy_button)
         self.copy_button.clicked.connect(self.copy_logs)
         self.copy_button.setFixedWidth(80)
         logs_layout.addWidget(self.copy_button)
@@ -85,7 +87,7 @@ class DiuTupDownloaderApp(QWidget):
         layout.addWidget(self.logs_area)
 
         button_layout = QHBoxLayout()
-        self.start_button = QPushButton(messages.start_button)
+        self.start_button = QPushButton(self.messages.start_button)
         self.start_button.clicked.connect(self.start_download)
 
         start_font = QFont()
@@ -95,12 +97,12 @@ class DiuTupDownloaderApp(QWidget):
 
         button_layout.addWidget(self.start_button)
 
-        self.pause_button = QPushButton(messages.pause_button)
+        self.pause_button = QPushButton(self.messages.pause_button)
         self.pause_button.clicked.connect(self.pause_download)
         self.pause_button.hide()
         button_layout.addWidget(self.pause_button)
 
-        self.continue_button = QPushButton(messages.continue_button)
+        self.continue_button = QPushButton(self.messages.continue_button)
         self.continue_button.clicked.connect(self.continue_download)
         self.continue_button.hide()
 
@@ -113,7 +115,7 @@ class DiuTupDownloaderApp(QWidget):
 
         button_layout.addWidget(self.continue_button)
 
-        self.exit_button = QPushButton(messages.exit_button)
+        self.exit_button = QPushButton(self.messages.exit_button)
         self.exit_button.clicked.connect(self.close)
         button_layout.addWidget(self.exit_button)
 
@@ -133,9 +135,9 @@ class DiuTupDownloaderApp(QWidget):
     def check_url_input(self):
         url = self.url_input.text().strip()
         if url:
-            self.status_label.setText(messages.check_url_input_ok)
+            self.status_label.setText(self.messages.check_url_input_ok)
         else:
-            self.status_label.setText(messages.instruction)
+            self.status_label.setText(self.messages.instruction)
 
     def find_ffmpeg(self):
         is_ffmpeg_vendors_exists, ffmpeg_vendors_path = Utils.check_ffmpeg()
@@ -152,25 +154,27 @@ class DiuTupDownloaderApp(QWidget):
         if sys.platform == "win32":
             ffmpeg_path += ".exe"
         if os.path.exists(ffmpeg_path):
-            print(messages.found_ffmpeg(ffmpeg_path))
+            print(self.messages.found_ffmpeg(ffmpeg_path))
             return ffmpeg_path
         else:
-            print(messages.not_found_ffmpeg(ffmpeg_path))
+            print(self.messages.not_found_ffmpeg(ffmpeg_path))
         return None
 
     def start_download(self):
         if not self.ffmpeg_path:
-            self.set_status(messages.ffmpeg_warning_message)
+            self.set_status(self.messages.ffmpeg_warning_message)
             return
 
         url = self.url_input.text().strip()
         if (not url) or ("youtube.com" not in url):
-            self.set_status(messages.invalid_url_message)
+            self.set_status(self.messages.invalid_url_message)
             return
 
         self.url_input.setEnabled(False)
         self.clear_button.setEnabled(False)
-        self.downloader = DownloaderThread(url, self.ffmpeg_path)
+        self.downloader = DownloaderThread(
+            url=url, ffmpeg_path=self.ffmpeg_path, messages=self.messages
+        )
         self.downloader.progress.connect(self.update_progress)
         self.downloader.playlist_progress.connect(self.update_playlist_progress)
         self.downloader.finished.connect(self.download_finished)
@@ -181,13 +185,13 @@ class DiuTupDownloaderApp(QWidget):
         self.pause_button.show()
         self.progress_bar.show()
         self.playlist_progress_label.show()
-        self.set_status(messages.scanning_videos)
+        self.set_status(self.messages.scanning_videos)
         self.is_paused = False
 
     def pause_download(self):
         if self.downloader and self.downloader.isRunning():
             self.downloader.cancel()
-            self.set_status(messages.pause_download_message)
+            self.set_status(self.messages.pause_download_message)
             self.start_button.setEnabled(False)
             self.pause_button.hide()
             self.continue_button.show()
@@ -224,10 +228,10 @@ class DiuTupDownloaderApp(QWidget):
             private_videos = original_total_videos - total_videos
             private_detached_message = ""
             if private_videos > 0:
-                private_detached_message = messages.detached_private_videos(
+                private_detached_message = self.messages.detached_private_videos(
                     private_videos
                 )
-            finished_message = messages.finished_message(
+            finished_message = self.messages.finished_message(
                 total_videos, original_total_videos, private_detached_message
             )
             self.set_status(finished_message)
@@ -241,15 +245,15 @@ class DiuTupDownloaderApp(QWidget):
 
     def download_error(self, error_message):
         if "ffprobe and ffmpeg not found" in error_message:
-            self.set_status(messages.ffmpeg_error_message)
+            self.set_status(self.messages.ffmpeg_error_message)
             QMessageBox.warning(
                 self,
-                messages.ffmpeg_error_title,
-                messages.ffmpeg_error_message,
+                self.messages.ffmpeg_error_title,
+                self.messages.ffmpeg_error_message,
                 QMessageBox.StandardButton.Ok,
             )
         else:
-            self.set_status(f"{messages.error}: {error_message}")
+            self.set_status(f"{self.messages.error}: {error_message}")
         self.start_button.show()
         self.pause_button.hide()
         self.progress_bar.hide()
@@ -274,5 +278,5 @@ class DiuTupDownloaderApp(QWidget):
         if clipboard is not None:
             clipboard.setText(self.logs_area.toPlainText())
             QMessageBox.information(
-                self, messages.copy_logs_title, messages.copy_logs_message
+                self, self.messages.copy_logs_title, self.messages.copy_logs_message
             )

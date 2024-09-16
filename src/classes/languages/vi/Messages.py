@@ -3,6 +3,15 @@ from ...Messages import Messages
 
 vi_messages = Messages()
 # ------------------------------------------------------------------------------------------------------#
+# Start Class SplashScreen
+vi_messages.splash_screen_title = "Đang khởi động"
+vi_messages.loading_app = "Đang mở ứng dụng..."
+vi_messages.switch_language = "Chuyển ngôn ngữ"
+vi_messages.open_app = "Mở ứng dụng"
+vi_messages.ready_to_start = "Sẵn sàng để bắt đầu!"
+# End Class SplashScreen
+# ------------------------------------------------------------------------------------------------------#
+# ------------------------------------------------------------------------------------------------------#
 # Start Class DiuTupDownloaderApp
 vi_messages.app_name = "Diu Túp downloader by Paul Pham 157"
 vi_messages.download_location_label = (
