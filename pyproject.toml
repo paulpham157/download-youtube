@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+version = "2.1.1"
+name = "diu-tup-downloader"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [
+    { name="Paul Pham", email="phamdinhhung2302@gmail.com" },
+]
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "Operating System :: OS Independent",
+    "Development Status :: 3 - Alpha"
+    #   1 - Planning
+    #   2 - Pre-Alpha
+    #   3 - Alpha
+    #   4 - Beta
+    #   5 - Production/Stable
+]
+dependencies = [
+    "yt-dlp",
+    "yt-dlp[default]",
+    "PyQt6",
+    "pyinstaller",
+]
+
+[project.scripts]
+diu-tup-downloader = "app:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = {find = {where = ["src"]}}
+
