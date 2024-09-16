@@ -1,14 +1,17 @@
 from .vi.Messages import vi_messages
 from .en.Messages import en_messages
 
+lang_code = {
+    "vi": {"name": "Tiếng Việt", "messages": vi_messages},
+    "en": {"name": "English", "messages": en_messages},
+}
+
 
 def get_messages(lang="vi"):
-    if lang == "vi":
-        return vi_messages
-    elif lang == "en":
-        return en_messages
+    if lang in lang_code:
+        return lang_code[lang]["messages"]
     else:
-        raise ValueError(f"Language not supported: {lang}")
+        return en_messages
 
 
-__all__ = ["get_messages"]
+__all__ = ["get_messages", "lang_code"]
