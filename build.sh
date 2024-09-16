@@ -48,9 +48,8 @@ build_macos() {
         echo "Đang nén file macOS..."
         version=$(grep -E '^version\s*=' pyproject.toml | awk -F'"' '{print $2}')
         zip_name="macos-dtdbpp157_v-${version}.zip"
-        (cd dist && zip -r "$zip_name" "macOS-DiuTupDownloaderByPaulPham157.app")
+        (cd dist && zip -r "$zip_name" "macOS-DiuTupDownloaderByPaulPham157.app" && cp -av $zip_name ~/Downloads/)
         echo "Đã tạo file nén: $zip_name"
-        cp -av $zip_name ~/Downloads/
     else
         echo "Không tìm thấy thư mục dist/macOS-DiuTupDownloaderByPaulPham157.app"
     fi
@@ -73,9 +72,8 @@ build_windows() {
         echo "Đang nén file Windows..."
         version=$(grep -E '^version\s*=' pyproject.toml | awk -F'"' '{print $2}')
         zip_name="windows-dtdbpp157_v-${version}.zip"
-        (cd dist && zip -r "$zip_name" "Windows-DiuTupDownloaderByPaulPham157.exe")
+        (cd dist && zip -r "$zip_name" "Windows-DiuTupDownloaderByPaulPham157.exe" && cp -av $zip_name ~/Downloads/)
         echo "Đã tạo file nén: $zip_name"
-        cp -av $zip_name ~/Downloads/
     else
         echo "Không tìm thấy file dist/Windows-DiuTupDownloaderByPaulPham157.exe"
     fi
@@ -112,9 +110,8 @@ wine_build_windows() {
         echo "Đang nén file Windows..."
         version=$(grep -E '^version\s*=' pyproject.toml | awk -F'"' '{print $2}')
         zip_name="windows-dtdbpp157_v-${version}.zip"
-        (cd dist && zip -r "$zip_name" "Windows-DiuTupDownloaderByPaulPham157.exe")
+        (cd dist && zip -r "$zip_name" "Windows-DiuTupDownloaderByPaulPham157.exe" && cp -av $zip_name ~/Downloads/)
         echo "Đã tạo file nén: $zip_name"
-        cp -av $zip_name ~/Downloads/
     else
         echo "Không tìm thấy file dist/Windows-DiuTupDownloaderByPaulPham157.exe"
     fi
