@@ -1,0 +1,31 @@
+# Add directories or file patterns to ignore during indexing (e.g. foo/ or *.csv)
+# Add directories or file patterns to ignore during indexing (e.g. foo/ or *.csv)
+.sql
+.env
+.DS_Store
+.git*
+.zip
+.tar
+.tar.gz
+.rar
+.7z
+.zipx
+.iso
+.img
+.cab
+.csv
+.xlsx
+.xls
+.db
+.tar.xz
+.tar.bz2
+.tar.7z
+.tar.zst
+.tar.lz4
+.tar.lzma
+.tar.lzo
+.tar.lz4
+.tar.lzma
+.tar.lzo
+.tar.lz4
+.tar.lzma
