@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QComboBox
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QColor, QPalette
-from .languages import get_messages
+from .languages import get_messages, lang_code
 
 
 class SplashScreen(QWidget):
@@ -24,7 +24,7 @@ class SplashScreen(QWidget):
         layout = QVBoxLayout()
 
         self.language_dropdown = QComboBox()
-        self.language_dropdown.addItems(["Tiếng Việt", "English"])
+        self.language_dropdown.addItems([lang["name"] for lang in lang_code.values()])
         self.language_dropdown.currentIndexChanged.connect(self.switch_language)
         layout.addWidget(self.language_dropdown)
 
@@ -40,9 +40,9 @@ class SplashScreen(QWidget):
         self.setLayout(layout)
 
     def switch_language(self):
-        self.current_lang = (
-            "en" if self.language_dropdown.currentText() == "English" else "vi"
-        )
+        self.current_lang = list(lang_code.keys())[
+            self.language_dropdown.currentIndex()
+        ]
         self.messages = get_messages(self.current_lang)
         self.updateUI()
 
