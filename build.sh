@@ -15,9 +15,12 @@
 # fi
 
 # Build the executable
-# v1
-pyinstaller --name="DiuTupDownloaderByPaulPham157" --icon 'src/assets/images/DiuTupDownloaderByPaulPham157.icns' --windowed --onefile --noconfirm --add-data "src/vendors/ffmpeg/ffmpeg:./src/vendors/ffmpeg/ffmpeg" src/app.py
-# v2
-# pyinstaller DiuTupDownloaderByPaulPham157.spec
+pyinstaller --name="DiuTupDownloaderByPaulPham157" \
+            --icon 'src/assets/images/DiuTupDownloaderByPaulPham157.icns' \
+            --windowed \
+            --onefile \
+            --noconfirm \
+            --add-data "src/vendors/ffmpeg/ffmpeg:src/vendors/ffmpeg/ffmpeg" \
+            src/app.py
 
 echo "Build completed. The executable is in the 'dist' folder."
