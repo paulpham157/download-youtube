@@ -19,11 +19,10 @@ class DownloaderThread(QThread):
         super().__init__()
         self.url = url
         self.is_cancelled = False
-        self.download_dir = Utils.get_download_dir()
+        self.download_dir = str(Utils.get_download_dir())
         self.original_total_videos = 0
-        self.single_list = Utils.get_single_dir()
-        self.playlist_title = None
-        self.ffmpeg_path = ffmpeg_path
+        self.single_list = str(Utils.get_single_dir())
+        self.ffmpeg_path = str(ffmpeg_path)
         self.total_videos = 0
         self.current_video = 0
         self.playlists = []
@@ -60,7 +59,9 @@ class DownloaderThread(QThread):
                     "preferredquality": "192",
                 }
             ],
-            "outtmpl": os.path.join(self.download_dir, "%(title)s.%(ext)s"),
+            "outtmpl": os.path.join(
+                str(self.download_dir), "%(title)s.%(ext)s"
+            ),  # Đảm bảo self.download_dir là chuỗi
             "progress_hooks": [self.progress_hook],
             "ffmpeg_location": self.ffmpeg_path,
             "extract_flat": True,
@@ -106,8 +107,8 @@ class DownloaderThread(QThread):
     def move_file_to_playlist(self, destination_dir):
         for file in os.listdir(self.download_dir):
             if file.endswith(".mp3"):
-                source_path = os.path.join(self.download_dir, file)
-                destination_path = os.path.join(destination_dir, file)
+                source_path = os.path.join(str(self.download_dir), file)
+                destination_path = os.path.join(str(destination_dir), file)
                 shutil.move(source_path, destination_path)
 
     def progress_hook(self, d):
