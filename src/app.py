@@ -4,11 +4,11 @@ import sys
 from PyQt6.QtWidgets import (
     QApplication,
 )
-from classes.DiuTipDownloaderApp import DiuTipDownloaderApp
+from classes.DiuTupDownloaderApp import DiuTupDownloaderApp
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    ex = DiuTipDownloaderApp()
+    ex = DiuTupDownloaderApp()
     ex.show()
     sys.exit(app.exec())

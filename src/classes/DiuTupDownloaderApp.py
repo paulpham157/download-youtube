@@ -16,13 +16,12 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtGui import QFont
 from .Utils import Utils
 from .DownloaderThread import DownloaderThread
-from .Messages import Messages
-from pathlib import Path
+from .languages import get_messages
 
-messages = Messages()
+messages = get_messages(lang="vi")
 
 
-class DiuTipDownloaderApp(QWidget):
+class DiuTupDownloaderApp(QWidget):
     def __init__(self):
         super().__init__()
         self.download_dir = Utils.get_download_dir()

@@ -1,4 +1,4 @@
-# YouTube Downloader
+# Diu Túp Downloader
 
 [Switch language](/README.md)
 

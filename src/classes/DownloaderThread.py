@@ -4,9 +4,9 @@ from PyQt6.QtCore import QThread, pyqtSignal
 import yt_dlp
 import shutil
 from .Utils import Utils
-from .Messages import Messages
+from .languages import get_messages
 
-messages = Messages()
+messages = get_messages(lang="vi")
 
 
 class DownloaderThread(QThread):
