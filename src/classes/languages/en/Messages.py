@@ -18,7 +18,7 @@ en_messages.download_location_label = (
     lambda d: f"""MP3 files will be saved at: {d}
 They are organized into subfolders corresponding to playlist names or 'Single' if the URL is a single video"""
 )
-en_messages.placeholder_url = "URL Address"
+en_messages.url_input_placeholder = "URL Address"
 en_messages.clear_button = "Clear"
 en_messages.logs_label = "Logs:"
 en_messages.copy_button = "Copy"

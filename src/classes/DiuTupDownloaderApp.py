@@ -38,8 +38,14 @@ class DiuTupDownloaderApp(QWidget):
 
     def initUI(self):
         self.setWindowTitle(self.messages.app_name)
-
         layout = QVBoxLayout()
+        button_layout = QHBoxLayout()
+        url_layout = QHBoxLayout()
+        logs_layout = QHBoxLayout()
+
+        self.exit_button = QPushButton(self.messages.exit_button)
+        self.exit_button.clicked.connect(self.close)
+        layout.addWidget(self.exit_button)
 
         self.download_location_label = QLabel(
             self.messages.download_location_label(self.download_dir)
@@ -47,9 +53,8 @@ class DiuTupDownloaderApp(QWidget):
         self.download_location_label.setWordWrap(True)
         layout.addWidget(self.download_location_label)
 
-        url_layout = QHBoxLayout()
         self.url_input = QLineEdit()
-        self.url_input.setPlaceholderText(self.messages.placeholder_url)
+        self.url_input.setPlaceholderText(self.messages.url_input_placeholder)
         url_layout.addWidget(self.url_input)
 
         self.clear_button = QPushButton(self.messages.clear_button)
@@ -60,7 +65,9 @@ class DiuTupDownloaderApp(QWidget):
 
         self.status_label = QLabel(self.messages.instruction)
         self.status_label.setWordWrap(True)
+
         layout.addWidget(self.status_label)
+
         self.url_input.textChanged.connect(self.check_url_input)
 
         self.playlist_progress_label = QLabel("")
@@ -72,7 +79,6 @@ class DiuTupDownloaderApp(QWidget):
         self.progress_bar.hide()
         layout.addWidget(self.progress_bar)
 
-        logs_layout = QHBoxLayout()
         self.logs_label = QLabel(self.messages.logs_label)
         logs_layout.addWidget(self.logs_label)
 
@@ -89,8 +95,8 @@ class DiuTupDownloaderApp(QWidget):
         self.logs_area.setFixedHeight(100)
         layout.addWidget(self.logs_area)
 
-        button_layout = QHBoxLayout()
         self.start_button = QPushButton(self.messages.start_button)
+        self.start_button.setEnabled(False)
         self.start_button.clicked.connect(self.start_download)
 
         start_font = QFont()
@@ -113,17 +119,10 @@ class DiuTupDownloaderApp(QWidget):
         continue_font.setPointSize(14)
         continue_font.setBold(True)
         self.continue_button.setFont(continue_font)
-
         self.continue_button.setMinimumSize(150, 50)
-
         button_layout.addWidget(self.continue_button)
 
-        self.exit_button = QPushButton(self.messages.exit_button)
-        self.exit_button.clicked.connect(self.close)
-        button_layout.addWidget(self.exit_button)
-
         layout.addLayout(button_layout)
-
         self.setLayout(layout)
 
     def center(self):
@@ -139,8 +138,10 @@ class DiuTupDownloaderApp(QWidget):
         url = self.url_input.text().strip()
         if url:
             self.status_label.setText(self.messages.check_url_input_ok)
+            self.start_button.setEnabled(True)
         else:
             self.status_label.setText(self.messages.instruction)
+            self.start_button.setEnabled(False)
 
     def find_ffmpeg(self):
         is_ffmpeg_vendors_exists, ffmpeg_vendors_path = Utils.check_ffmpeg()
@@ -169,6 +170,7 @@ class DiuTupDownloaderApp(QWidget):
             return
 
         url = self.url_input.text().strip()
+        print("url: ", url)
         if (not url) or ("youtube.com" not in url):
             self.set_status(self.messages.invalid_url_message)
             return
@@ -293,7 +295,7 @@ class DiuTupDownloaderApp(QWidget):
         self.download_location_label.setText(
             self.messages.download_location_label(self.download_dir)
         )
-        self.url_input.setPlaceholderText(self.messages.placeholder_url)
+        self.url_input.setPlaceholderText(self.messages.url_input_placeholder)
         self.clear_button.setText(self.messages.clear_button)
         self.status_label.setText(self.messages.instruction)
         self.logs_label.setText(self.messages.logs_label)
@@ -302,4 +304,3 @@ class DiuTupDownloaderApp(QWidget):
         self.pause_button.setText(self.messages.pause_button)
         self.continue_button.setText(self.messages.continue_button)
         self.exit_button.setText(self.messages.exit_button)
-        # Cập nhật các thông báo khác nếu cần

@@ -4,6 +4,14 @@ if [ "$1" = "--new" ]; then
     pip install -e .
 fi
 
+if [ ! -d "src/vendors/ffmpeg" ]; then
+    echo "Đang tạo thư mục src/vendors/ffmpeg..."
+    mkdir -p src/vendors/ffmpeg
+    echo "Đã tạo xong thư mục src/vendors/ffmpeg"
+else
+    echo "Thư mục src/vendors/ffmpeg đã tồn tại"
+fi
+
 if [ ! -f "src/vendors/ffmpeg/ffmpeg" ]; then
     echo "Đang tải ffmpeg linux..."
     curl -L https://evermeet.cx/ffmpeg/ffmpeg-7.0.2.zip -o ffmpeg-linux.zip
