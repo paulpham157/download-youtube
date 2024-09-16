@@ -65,6 +65,7 @@ class DownloaderThread(QThread):
             "progress_hooks": [self.progress_hook],
             "ffmpeg_location": self.ffmpeg_path,
             "extract_flat": True,
+            "no_color": True,
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:

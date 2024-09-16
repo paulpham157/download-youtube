@@ -17,6 +17,6 @@ if not exist ffmpeg.exe (
 )
 
 REM Build the executable
-pyinstaller --name="YoutubeDownloaderByPaulPham157" --windowed --onefile --add-data "ffmpeg.exe;." app.py
+pyinstaller --name="DiuTupDownloaderByPaulPham157" --windowed --onefile --add-data "ffmpeg.exe;." app.py
 
 echo Build completed. The executable is in the 'dist' folder.
