@@ -1,4 +1,0 @@
-yt-dlp
-yt-dlp[default]
-PyQt6
-pyinstaller
