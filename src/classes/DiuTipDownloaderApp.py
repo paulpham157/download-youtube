@@ -144,11 +144,23 @@ Chúng được chia vào các thư mục con tương ứng với tên của pla
         is_ffmpeg_vendors_exists, ffmpeg_vendors_path = Utils.check_ffmpeg()
         if not is_ffmpeg_vendors_exists:
             ffmpeg_vendors_path.mkdir(parents=True, exist_ok=True)
-        ffmpeg_path = ffmpeg_vendors_path / "ffmpeg"
+
+        if getattr(sys, "frozen", False):
+            # Nếu ứng dụng được đóng gói
+            base_path = sys._MEIPASS
+        else:
+            # Nếu đang chạy từ mã nguồn
+            base_path = os.path.dirname(os.path.abspath(__file__))
+
+        ffmpeg_path = os.path.join(base_path, "src", "vendors", "ffmpeg", "ffmpeg")
         if sys.platform == "win32":
             ffmpeg_path += ".exe"
+
         if os.path.exists(ffmpeg_path):
+            print(f"Đã tìm thấy ffmpeg tại: {ffmpeg_path}")
             return ffmpeg_path
+        else:
+            print(f"Không tìm thấy ffmpeg tại: {ffmpeg_path}")
         return None
 
     def check_dependencies(self):
