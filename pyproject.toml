@@ -26,6 +26,7 @@ dependencies = [
     "yt-dlp[default]",
     "PyQt6",
     "pyinstaller",
+    "Pillow",
 ]
 
 [project.scripts]
