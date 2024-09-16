@@ -4,9 +4,6 @@ from PyQt6.QtCore import QThread, pyqtSignal
 import yt_dlp
 import shutil
 from .Utils import Utils
-from .languages import get_messages
-
-messages = get_messages(lang="vi")
 
 
 class DownloaderThread(QThread):
@@ -15,8 +12,9 @@ class DownloaderThread(QThread):
     finished = pyqtSignal()
     error = pyqtSignal(str)
 
-    def __init__(self, url, ffmpeg_path):
+    def __init__(self, url, ffmpeg_path, messages):
         super().__init__()
+        self.messages = messages
         self.url = url
         self.is_cancelled = False
         self.download_dir = str(Utils.get_download_dir())
@@ -33,7 +31,9 @@ class DownloaderThread(QThread):
         try:
             if "/playlists" in self.url:
                 self.playlists = Utils.get_channel_playlists(self.url)
-                self.progress.emit(messages.playlist_in_channel(len(self.playlists)))
+                self.progress.emit(
+                    self.messages.playlist_in_channel(len(self.playlists))
+                )
                 for playlist in self.playlists:
                     if self.is_cancelled:
                         break
@@ -69,13 +69,13 @@ class DownloaderThread(QThread):
             if info is not None:
                 if "entries" in info:
                     self.playlist_title = info.get(
-                        "title", messages.unknown_playlist_name
+                        "title", self.messages.unknown_playlist_name
                     )
                     self.current_playlist_name = self.playlist_title
                     self.original_total_videos = len(info["entries"])
                     self.total_videos = self.original_total_videos
                     self.progress.emit(
-                        messages.filtering_private_video(
+                        self.messages.filtering_private_video(
                             self.total_videos, self.playlist_title
                         )
                     )
@@ -90,7 +90,7 @@ class DownloaderThread(QThread):
                         if is_private:
                             self.total_videos -= 1
                             self.progress.emit(
-                                messages.count_private_video(self.total_videos)
+                                self.messages.count_private_video(self.total_videos)
                             )
                             continue
                         else:
@@ -101,7 +101,7 @@ class DownloaderThread(QThread):
                 else:
                     self.total_videos = 1
                     self.original_total_videos = 1
-                    self.progress.emit(messages.single_video())
+                    self.progress.emit(self.messages.single_video())
                     ydl.download([str(playlist_url)])
                     self.move_file_to_playlist(self.single_list)
 
@@ -119,7 +119,7 @@ class DownloaderThread(QThread):
 
             if self.total_videos > 1:
                 self.progress.emit(
-                    messages.total_percent_downloading(
+                    self.messages.total_percent_downloading(
                         self.current_video + 1,
                         self.total_videos,
                         percent,
@@ -127,19 +127,19 @@ class DownloaderThread(QThread):
                     )
                 )
             else:
-                self.progress.emit(messages.percent_downloading(percent, filename))
+                self.progress.emit(self.messages.percent_downloading(percent, filename))
 
         elif d["status"] == "finished":
             self.current_video += 1
             filename = os.path.basename(d["filename"])
             if self.total_videos > 1:
                 self.progress.emit(
-                    messages.converting_to_audio(
+                    self.messages.converting_to_audio(
                         self.current_video, self.total_videos, filename
                     )
                 )
             else:
-                self.progress.emit(messages.signle_converting_to_audio(filename))
+                self.progress.emit(self.messages.signle_converting_to_audio(filename))
 
     def cancel(self):
         self.is_cancelled = True

@@ -2,6 +2,15 @@
 class Messages:
     def __init__(self):
         # ------------------------------------------------------------------------------------------------------#
+        # Start Class SplashScreen
+        self.splash_screen_title = "Đang khởi động"
+        self.loading_app = "Đang mở ứng dụng..."
+        self.switch_language = "Chuyển ngôn ngữ"
+        self.open_app = "Mở ứng dụng"
+        self.ready_to_start = "Sẵn sàng để bắt đầu!"
+        # End Class SplashScreen
+        # ------------------------------------------------------------------------------------------------------#
+        # ------------------------------------------------------------------------------------------------------#
         # Start Class DiuTupDownloaderApp
         self.app_name = "Diu Túp downloader by Paul Pham 157"
         self.download_location_label = (
