@@ -31,26 +31,24 @@ class DiuTipDownloaderApp(QWidget):
         self.downloader = None
         self.is_paused = False
         self.center()
-        self.check_dependencies()
 
     def initUI(self):
-        self.setWindowTitle("Diu Túp downloader by Paul Pham 157")
+        self.setWindowTitle(messages.app_name)
 
         layout = QVBoxLayout()
 
         self.download_location_label = QLabel(
-            f"""Các file mp3 sẽ lưu tại: {self.download_dir}
-Chúng được chia vào các thư mục con tương ứng với tên của playlist hoặc Single nếu url là video đơn lẻ"""
+            messages.download_location_label(self.download_dir)
         )
         self.download_location_label.setWordWrap(True)
         layout.addWidget(self.download_location_label)
 
         url_layout = QHBoxLayout()
         self.url_input = QLineEdit()
-        self.url_input.setPlaceholderText("Địa chỉ URL")
+        self.url_input.setPlaceholderText(messages.placeholder_url)
         url_layout.addWidget(self.url_input)
 
-        self.clear_button = QPushButton("Clear")
+        self.clear_button = QPushButton(messages.clear_button)
         self.clear_button.clicked.connect(self.clear_url)
         url_layout.addWidget(self.clear_button)
 
@@ -71,10 +69,10 @@ Chúng được chia vào các thư mục con tương ứng với tên của pla
         layout.addWidget(self.progress_bar)
 
         logs_layout = QHBoxLayout()
-        self.logs_label = QLabel("Logs:")
+        self.logs_label = QLabel(messages.logs_label)
         logs_layout.addWidget(self.logs_label)
 
-        self.copy_button = QPushButton("Copy")
+        self.copy_button = QPushButton(messages.copy_button)
         self.copy_button.clicked.connect(self.copy_logs)
         self.copy_button.setFixedWidth(80)
         logs_layout.addWidget(self.copy_button)
@@ -88,7 +86,7 @@ Chúng được chia vào các thư mục con tương ứng với tên của pla
         layout.addWidget(self.logs_area)
 
         button_layout = QHBoxLayout()
-        self.start_button = QPushButton("START")
+        self.start_button = QPushButton(messages.start_button)
         self.start_button.clicked.connect(self.start_download)
 
         start_font = QFont()
@@ -98,12 +96,12 @@ Chúng được chia vào các thư mục con tương ứng với tên của pla
 
         button_layout.addWidget(self.start_button)
 
-        self.pause_button = QPushButton("Pause")
+        self.pause_button = QPushButton(messages.pause_button)
         self.pause_button.clicked.connect(self.pause_download)
         self.pause_button.hide()
         button_layout.addWidget(self.pause_button)
 
-        self.continue_button = QPushButton("Continue")
+        self.continue_button = QPushButton(messages.continue_button)
         self.continue_button.clicked.connect(self.continue_download)
         self.continue_button.hide()
 
@@ -116,7 +114,7 @@ Chúng được chia vào các thư mục con tương ứng với tên của pla
 
         button_layout.addWidget(self.continue_button)
 
-        self.exit_button = QPushButton("Exit")
+        self.exit_button = QPushButton(messages.exit_button)
         self.exit_button.clicked.connect(self.close)
         button_layout.addWidget(self.exit_button)
 
@@ -136,7 +134,7 @@ Chúng được chia vào các thư mục con tương ứng với tên của pla
     def check_url_input(self):
         url = self.url_input.text().strip()
         if url:
-            self.status_label.setText("Ô kê, anh nhấn nút start là được")
+            self.status_label.setText(messages.check_url_input_ok)
         else:
             self.status_label.setText(messages.instruction)
 
@@ -146,42 +144,29 @@ Chúng được chia vào các thư mục con tương ứng với tên của pla
             ffmpeg_vendors_path.mkdir(parents=True, exist_ok=True)
 
         if getattr(sys, "frozen", False):
-            # Nếu ứng dụng được đóng gói
             base_path = sys._MEIPASS
         else:
-            # Nếu đang chạy từ mã nguồn
-            base_path = os.path.dirname(os.path.abspath(__file__))
-
+            base_path = os.path.dirname(
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            )
         ffmpeg_path = os.path.join(base_path, "src", "vendors", "ffmpeg", "ffmpeg")
         if sys.platform == "win32":
             ffmpeg_path += ".exe"
-
         if os.path.exists(ffmpeg_path):
-            print(f"Đã tìm thấy ffmpeg tại: {ffmpeg_path}")
+            print(messages.found_ffmpeg(ffmpeg_path))
             return ffmpeg_path
         else:
-            print(f"Không tìm thấy ffmpeg tại: {ffmpeg_path}")
+            print(messages.not_found_ffmpeg(ffmpeg_path))
         return None
-
-    def check_dependencies(self):
-        if not self.ffmpeg_path:
-            QMessageBox.warning(
-                self,
-                "Thiếu phụ thuộc",
-                "Không tìm thấy ffmpeg. Vui lòng đặt file ffmpeg trong cùng thư mục với ứng dụng.",
-                QMessageBox.StandardButton.Ok,
-            )
 
     def start_download(self):
         if not self.ffmpeg_path:
-            self.set_status(
-                "Lỗi: Không tìm thấy ffmpeg. Vui lòng đặt file ffmpeg trong cùng thư mục với ứng dụng."
-            )
+            self.set_status(messages.ffmpeg_warning_message)
             return
 
         url = self.url_input.text().strip()
         if (not url) or ("youtube.com" not in url):
-            self.set_status("Vui lòng nhập URL YouTube hợp lệ")
+            self.set_status(messages.invalid_url_message)
             return
 
         self.url_input.setEnabled(False)
@@ -197,13 +182,13 @@ Chúng được chia vào các thư mục con tương ứng với tên của pla
         self.pause_button.show()
         self.progress_bar.show()
         self.playlist_progress_label.show()
-        self.set_status("Đang quét thông tin các video...")
+        self.set_status(messages.scanning_videos)
         self.is_paused = False
 
     def pause_download(self):
         if self.downloader and self.downloader.isRunning():
             self.downloader.cancel()
-            self.set_status("Đang chờ anh nhấn tiếp tục đấy...")
+            self.set_status(messages.pause_download_message)
             self.start_button.setEnabled(False)
             self.pause_button.hide()
             self.continue_button.show()
@@ -240,12 +225,12 @@ Chúng được chia vào các thư mục con tương ứng với tên của pla
             private_videos = original_total_videos - total_videos
             private_detached_message = ""
             if private_videos > 0:
-                private_detached_message = (
-                    f"Có {private_videos} video private không tải được"
+                private_detached_message = messages.detached_private_videos(
+                    private_videos
                 )
-            finished_message = f"""Tải xong {total_videos} / {original_total_videos} rồi anh ạ
-    {private_detached_message}
-    Anh dán URL khác vào để tải tiếp hoặc là thoát nếu đã xong"""
+            finished_message = messages.finished_message(
+                total_videos, original_total_videos, private_detached_message
+            )
             self.set_status(finished_message)
             self.start_button.show()
             self.pause_button.hide()
@@ -257,15 +242,15 @@ Chúng được chia vào các thư mục con tương ứng với tên của pla
 
     def download_error(self, error_message):
         if "ffprobe and ffmpeg not found" in error_message:
-            self.set_status("Lỗi: ffmpeg không được cài đặt hoặc không nằm trong PATH")
+            self.set_status(messages.ffmpeg_error_message)
             QMessageBox.warning(
                 self,
-                "Lỗi ffmpeg",
-                "Không tìm thấy ffmpeg. Vui lòng cài đặt ffmpeg và đảm bảo nó nằm trong PATH hệ thống.",
+                messages.ffmpeg_error_title,
+                messages.ffmpeg_error_message,
                 QMessageBox.StandardButton.Ok,
             )
         else:
-            self.set_status(f"Lỗi: {error_message}")
+            self.set_status(f"{messages.error}: {error_message}")
         self.start_button.show()
         self.pause_button.hide()
         self.progress_bar.hide()
@@ -290,5 +275,5 @@ Chúng được chia vào các thư mục con tương ứng với tên của pla
         if clipboard is not None:
             clipboard.setText(self.logs_area.toPlainText())
             QMessageBox.information(
-                self, "Thông báo", "Đã sao chép logs vào clipboard!"
+                self, messages.copy_logs_title, messages.copy_logs_message
             )

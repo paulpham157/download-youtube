@@ -33,9 +33,7 @@ class DownloaderThread(QThread):
         try:
             if "/playlists" in self.url:
                 self.playlists = Utils.get_channel_playlists(self.url)
-                self.progress.emit(
-                    f"Tìm thấy {len(self.playlists)} playlist trong kênh"
-                )
+                self.progress.emit(messages.playlist_in_channel(len(self.playlists)))
                 for playlist in self.playlists:
                     if self.is_cancelled:
                         break
@@ -59,9 +57,7 @@ class DownloaderThread(QThread):
                     "preferredquality": "192",
                 }
             ],
-            "outtmpl": os.path.join(
-                str(self.download_dir), "%(title)s.%(ext)s"
-            ),  # Đảm bảo self.download_dir là chuỗi
+            "outtmpl": os.path.join(str(self.download_dir), "%(title)s.%(ext)s"),
             "progress_hooks": [self.progress_hook],
             "ffmpeg_location": self.ffmpeg_path,
             "extract_flat": True,
@@ -72,12 +68,16 @@ class DownloaderThread(QThread):
             info = ydl.extract_info(playlist_url, download=False)
             if info is not None:
                 if "entries" in info:
-                    self.playlist_title = info.get("title", "Unknown Playlist Name")
+                    self.playlist_title = info.get(
+                        "title", messages.unknown_playlist_name
+                    )
                     self.current_playlist_name = self.playlist_title
                     self.original_total_videos = len(info["entries"])
                     self.total_videos = self.original_total_videos
                     self.progress.emit(
-                        f"Tìm thấy {self.total_videos} video trong playlist {self.playlist_title}\nĐang lọc các video private"
+                        messages.filtering_private_video(
+                            self.total_videos, self.playlist_title
+                        )
                     )
                     playlist_dir = os.path.join(self.download_dir, self.playlist_title)
                     os.makedirs(playlist_dir, exist_ok=True)
@@ -90,7 +90,7 @@ class DownloaderThread(QThread):
                         if is_private:
                             self.total_videos -= 1
                             self.progress.emit(
-                                f"Có 1 video private, còn lại {self.total_videos} video, tiếp tục quét"
+                                messages.count_private_video(self.total_videos)
                             )
                             continue
                         else:
@@ -101,7 +101,7 @@ class DownloaderThread(QThread):
                 else:
                     self.total_videos = 1
                     self.original_total_videos = 1
-                    self.progress.emit("Một video đơn")
+                    self.progress.emit(messages.single_video())
                     ydl.download([str(playlist_url)])
                     self.move_file_to_playlist(self.single_list)
 
@@ -119,20 +119,27 @@ class DownloaderThread(QThread):
 
             if self.total_videos > 1:
                 self.progress.emit(
-                    f"[{self.current_video + 1}/{self.total_videos}] videos đang tải: {percent}\n{filename}"
+                    messages.total_percent_downloading(
+                        self.current_video + 1,
+                        self.total_videos,
+                        percent,
+                        filename,
+                    )
                 )
             else:
-                self.progress.emit(f"Đang tải video: {percent}\n{filename}")
+                self.progress.emit(messages.percent_downloading(percent, filename))
 
         elif d["status"] == "finished":
             self.current_video += 1
             filename = os.path.basename(d["filename"])
             if self.total_videos > 1:
                 self.progress.emit(
-                    f"[{self.current_video}/{self.total_videos}] videos đang chuyển đổi sang audio:\n{filename}"
+                    messages.converting_to_audio(
+                        self.current_video, self.total_videos, filename
+                    )
                 )
             else:
-                self.progress.emit(f"Đang chuyển đổi video sang audio:\n{filename}")
+                self.progress.emit(messages.signle_converting_to_audio(filename))
 
     def cancel(self):
         self.is_cancelled = True
