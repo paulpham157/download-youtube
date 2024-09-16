@@ -18,7 +18,7 @@ vi_messages.download_location_label = (
     lambda d: f"""Các file mp3 sẽ lưu tại: {d}
 Chúng được chia vào các thư mục con tương ứng với tên của playlist hoặc Single nếu url là video đơn lẻ"""
 )
-vi_messages.placeholder_url = "Địa chỉ URL"
+vi_messages.url_input_placeholder = "Địa chỉ URL"
 vi_messages.clear_button = "Xoá"
 vi_messages.logs_label = "Nhật ký:"
 vi_messages.copy_button = "Sao chép"
