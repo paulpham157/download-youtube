@@ -176,7 +176,7 @@ class DiuTupDownloaderApp(QWidget):
         self.url_input.setEnabled(False)
         self.clear_button.setEnabled(False)
         self.downloader = DownloaderThread(
-            url=url, ffmpeg_path=self.ffmpeg_path, messages=self.messages
+            url=url, ffmpeg_path=self.ffmpeg_path, messages=self.messages, app=self
         )
         self.downloader.progress.connect(self.update_progress)
         self.downloader.playlist_progress.connect(self.update_playlist_progress)
