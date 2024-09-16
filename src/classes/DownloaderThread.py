@@ -4,6 +4,7 @@ from PyQt6.QtCore import QThread, pyqtSignal
 import yt_dlp
 import shutil
 from .Utils import Utils
+from .languages import get_messages
 
 
 class DownloaderThread(QThread):
@@ -12,9 +13,11 @@ class DownloaderThread(QThread):
     finished = pyqtSignal()
     error = pyqtSignal(str)
 
-    def __init__(self, url, ffmpeg_path, messages):
+    def __init__(self, url, ffmpeg_path, messages, app):
         super().__init__()
         self.messages = messages
+        self.app = app
+        self.app.splash_screen.language_changed.connect(self.update_language)
         self.url = url
         self.is_cancelled = False
         self.download_dir = str(Utils.get_download_dir())
@@ -144,3 +147,6 @@ class DownloaderThread(QThread):
     def cancel(self):
         self.is_cancelled = True
         self.terminate()
+
+    def update_language(self, lang):
+        self.messages = get_messages(lang)

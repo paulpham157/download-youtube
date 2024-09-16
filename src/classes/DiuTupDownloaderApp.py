@@ -16,12 +16,15 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtGui import QFont
 from .Utils import Utils
 from .DownloaderThread import DownloaderThread
+from .languages import get_messages
 
 
 class DiuTupDownloaderApp(QWidget):
-    def __init__(self, messages):
+    def __init__(self, messages, splash_screen):
         super().__init__()
         self.messages = messages
+        self.splash_screen = splash_screen
+        self.splash_screen.language_changed.connect(self.update_language)
         self.download_dir = str(Utils.get_download_dir())
         self.ffmpeg_path = self.find_ffmpeg()
         self.initUI()
@@ -280,3 +283,23 @@ class DiuTupDownloaderApp(QWidget):
             QMessageBox.information(
                 self, self.messages.copy_logs_title, self.messages.copy_logs_message
             )
+
+    def update_language(self, lang):
+        self.messages = get_messages(lang)
+        self.updateUI()
+
+    def updateUI(self):
+        self.setWindowTitle(self.messages.app_name)
+        self.download_location_label.setText(
+            self.messages.download_location_label(self.download_dir)
+        )
+        self.url_input.setPlaceholderText(self.messages.placeholder_url)
+        self.clear_button.setText(self.messages.clear_button)
+        self.status_label.setText(self.messages.instruction)
+        self.logs_label.setText(self.messages.logs_label)
+        self.copy_button.setText(self.messages.copy_button)
+        self.start_button.setText(self.messages.start_button)
+        self.pause_button.setText(self.messages.pause_button)
+        self.continue_button.setText(self.messages.continue_button)
+        self.exit_button.setText(self.messages.exit_button)
+        # Cập nhật các thông báo khác nếu cần
