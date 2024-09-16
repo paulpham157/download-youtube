@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QComboBox
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtGui import QColor, QPalette, QIcon
+from PyQt6.QtGui import QBrush, QPalette, QIcon, QPixmap
 from .languages import get_messages, lang_code
 
 
@@ -16,10 +16,11 @@ class SplashScreen(QWidget):
 
     def initUI(self):
         self.setWindowTitle(self.messages.splash_screen_title)
-        self.setFixedSize(400, 300)
 
         palette = self.palette()
-        palette.setColor(QPalette.ColorRole.Window, QColor(128, 128, 128))
+        background = QPixmap("src/assets/images/splash_background.jpg")
+        self.setFixedSize(background.width(), background.height())
+        palette.setBrush(QPalette.ColorRole.Window, QBrush(background))
         self.setPalette(palette)
 
         layout = QVBoxLayout()
