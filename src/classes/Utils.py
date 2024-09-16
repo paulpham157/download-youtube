@@ -30,14 +30,12 @@ class Utils:
 
     def get_download_dir():
         home_dir = Path.home()
-        download_dir = home_dir / "Downloads" / "YoutubeDownloaderByPaulPham157"
+        download_dir = home_dir / "Downloads" / "DiuTupDownloaderByPaulPham157"
         download_dir.mkdir(parents=True, exist_ok=True)
         return str(download_dir)
 
     def get_single_dir():
         home_dir = Path.home()
-        single_dir = (
-            home_dir / "Downloads" / "YoutubeDownloaderByPaulPham157" / "Single"
-        )
+        single_dir = home_dir / "Downloads" / "DiuTupDownloaderByPaulPham157" / "Single"
         single_dir.mkdir(parents=True, exist_ok=True)
         return str(single_dir)
