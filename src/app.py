@@ -16,7 +16,9 @@ class App(QApplication):
     def start(self):
         self.splash.show()
         self.processEvents()
-        self.main_app = DiuTupDownloaderApp(messages=self.messages)
+        self.main_app = DiuTupDownloaderApp(
+            messages=self.messages, splash_screen=self.splash
+        )
 
         # Kiểm tra các phụ thuộc
         if self.main_app.check_dependencies():

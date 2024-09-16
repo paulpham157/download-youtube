@@ -6,6 +6,7 @@ from .languages import get_messages, lang_code
 
 class SplashScreen(QWidget):
     ready_signal = pyqtSignal()
+    language_changed = pyqtSignal(str)
 
     def __init__(self):
         super().__init__()
@@ -45,6 +46,7 @@ class SplashScreen(QWidget):
         ]
         self.messages = get_messages(self.current_lang)
         self.updateUI()
+        self.language_changed.emit(self.current_lang)
 
     def updateUI(self):
         self.setWindowTitle(self.messages.splash_screen_title)
