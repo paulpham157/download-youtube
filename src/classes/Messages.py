@@ -2,7 +2,7 @@
 class Messages:
     def __init__(self):
         # ------------------------------------------------------------------------------------------------------#
-        # Start Class DiuTipDownloaderApp
+        # Start Class DiuTupDownloaderApp
         self.app_name = "Diu Túp downloader by Paul Pham 157"
         self.download_location_label = (
             lambda d: f"""Các file mp3 sẽ lưu tại: {d}
@@ -33,7 +33,7 @@ Chúng được chia vào các thư mục con tương ứng với tên của pla
         self.error = "Lỗi: "
         self.copy_logs_title = "Thông báo"
         self.copy_logs_message = "Đã sao chép logs vào clipboard!"
-        # End Class DiuTipDownloaderApp
+        # End Class DiuTupDownloaderApp
         # ------------------------------------------------------------------------------------------------------#
         # ------------------------------------------------------------------------------------------------------#
         # Start Class DownloaderThread

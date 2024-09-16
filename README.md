@@ -16,7 +16,7 @@
   </tr>
   <tr>
     <td>
-    <a href="docs/locale/en/README.en.md">
+    <a href="src/docs/locale/en/README.en.md">
         <img src="src/assets/images/United_Kingdom_Flag.svg" alt="English" width="30" height="20" style="vertical-align: middle;">
         <span style="margin-left: 5px; vertical-align: middle;">English</span>
     </a>

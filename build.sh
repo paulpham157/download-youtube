@@ -41,6 +41,8 @@ build_macos() {
                 --onefile \
                 --noconfirm \
                 --add-data "src/vendors/ffmpeg/ffmpeg:src/vendors/ffmpeg/ffmpeg" \
+                --add-data "src/assets/images/Vietnam_Flag.svg:src/assets/images/Vietnam_Flag.svg" \
+                --add-data "src/assets/images/United_Kingdom_Flag.svg:src/assets/images/United_Kingdom_Flag.svg" \
                 src/app.py
     if [ -d "dist/macOS-DiuTupDownloaderByPaulPham157.app" ]; then
         echo "Đang nén file macOS..."
@@ -48,7 +50,7 @@ build_macos() {
         zip_name="macos-dtdbpp157_v-${version}.zip"
         (cd dist && zip -r "$zip_name" "macOS-DiuTupDownloaderByPaulPham157.app")
         echo "Đã tạo file nén: $zip_name"
-        mv $zip_name ~/Downloads/
+        cp -av $zip_name ~/Downloads/
     else
         echo "Không tìm thấy thư mục dist/macOS-DiuTupDownloaderByPaulPham157.app"
     fi
@@ -64,6 +66,8 @@ build_windows() {
                 --add-data "src/vendors/ffmpeg/ffmpeg.exe:src/vendors/ffmpeg/ffmpeg.exe" \
                 --add-data "src/vendors/ffmpeg/ffplay.exe:src/vendors/ffmpeg/ffplay.exe" \
                 --add-data "src/vendors/ffmpeg/ffprobe.exe:src/vendors/ffmpeg/ffprobe.exe" \
+                --add-data "src/assets/images/Vietnam_Flag.svg:src/assets/images/Vietnam_Flag.svg" \
+                --add-data "src/assets/images/United_Kingdom_Flag.svg:src/assets/images/United_Kingdom_Flag.svg" \
                 src/app.py
     if [ -f "dist/Windows-DiuTupDownloaderByPaulPham157" ]; then
         echo "Đang nén file Windows..."
@@ -71,6 +75,7 @@ build_windows() {
         zip_name="windows-dtdbpp157_v-${version}.zip"
         (cd dist && zip -r "$zip_name" "Windows-DiuTupDownloaderByPaulPham157.exe")
         echo "Đã tạo file nén: $zip_name"
+        cp -av $zip_name ~/Downloads/
     else
         echo "Không tìm thấy file dist/Windows-DiuTupDownloaderByPaulPham157.exe"
     fi
@@ -100,6 +105,8 @@ wine_build_windows() {
                 --add-data "src/vendors/ffmpeg/ffmpeg.exe:src/vendors/ffmpeg/ffmpeg.exe" \
                 --add-data "src/vendors/ffmpeg/ffplay.exe:src/vendors/ffmpeg/ffplay.exe" \
                 --add-data "src/vendors/ffmpeg/ffprobe.exe:src/vendors/ffmpeg/ffprobe.exe" \
+                --add-data "src/assets/images/Vietnam_Flag.svg:src/assets/images/Vietnam_Flag.svg" \
+                --add-data "src/assets/images/United_Kingdom_Flag.svg:src/assets/images/United_Kingdom_Flag.svg" \
                 src/app.py
     if [ -f "dist/Windows-DiuTupDownloaderByPaulPham157" ]; then
         echo "Đang nén file Windows..."
@@ -107,6 +114,7 @@ wine_build_windows() {
         zip_name="windows-dtdbpp157_v-${version}.zip"
         (cd dist && zip -r "$zip_name" "Windows-DiuTupDownloaderByPaulPham157.exe")
         echo "Đã tạo file nén: $zip_name"
+        cp -av $zip_name ~/Downloads/
     else
         echo "Không tìm thấy file dist/Windows-DiuTupDownloaderByPaulPham157.exe"
     fi
