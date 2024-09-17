@@ -66,7 +66,6 @@ class DownloaderThread(QThread):
             "extract_flat": True,
             "no_color": True,
         }
-
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(playlist_url, download=False)
             if info is not None:
@@ -104,7 +103,7 @@ class DownloaderThread(QThread):
                 else:
                     self.total_videos = 1
                     self.original_total_videos = 1
-                    self.progress.emit(self.messages.single_video())
+                    self.progress.emit(self.messages.single_video)
                     ydl.download([str(playlist_url)])
                     self.move_file_to_playlist(self.single_list)
 
@@ -119,7 +118,6 @@ class DownloaderThread(QThread):
         if d["status"] == "downloading":
             percent = d["_percent_str"]
             filename = os.path.basename(d["filename"])
-
             if self.total_videos > 1:
                 self.progress.emit(
                     self.messages.total_percent_downloading(
@@ -131,7 +129,6 @@ class DownloaderThread(QThread):
                 )
             else:
                 self.progress.emit(self.messages.percent_downloading(percent, filename))
-
         elif d["status"] == "finished":
             self.current_video += 1
             filename = os.path.basename(d["filename"])
