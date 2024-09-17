@@ -16,23 +16,16 @@ class SplashScreen(QWidget):
 
     def initUI(self):
         self.setWindowTitle(self.messages.splash_screen_title)
-
         background = QPixmap("src/assets/images/splash_background.jpg")
         self.setFixedSize(background.width(), background.height())
-
         palette = self.palette()
         palette.setBrush(QPalette.ColorRole.Window, QBrush(background))
         self.setPalette(palette)
-
-        # Tạo overlay tối màu nhưng vẫn trong suốt
         overlay = QWidget(self)
         overlay.setStyleSheet("background-color: rgba(0, 0, 0, 100);")
         overlay.setFixedSize(self.size())
-
         layout = QVBoxLayout(overlay)
         layout.setContentsMargins(20, 20, 20, 20)
-
-        # Tạo một frame để chứa các widget
         frame = QFrame()
         frame.setStyleSheet(
             """
@@ -43,7 +36,6 @@ class SplashScreen(QWidget):
         """
         )
         frame_layout = QVBoxLayout(frame)
-
         self.language_dropdown = QComboBox()
         for code, lang_info in lang_code.items():
             icon = QIcon(lang_info["icon"])
@@ -68,12 +60,10 @@ class SplashScreen(QWidget):
         """
         )
         frame_layout.addWidget(self.language_dropdown)
-
         self.status_label = QLabel(self.messages.loading_app)
         self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.status_label.setStyleSheet("color: white; font-size: 16px;")
         frame_layout.addWidget(self.status_label)
-
         self.start_button = QPushButton(self.messages.open_app)
         self.start_button.clicked.connect(self.ready_signal.emit)
         self.start_button.hide()
@@ -92,9 +82,7 @@ class SplashScreen(QWidget):
         """
         )
         frame_layout.addWidget(self.start_button)
-
         layout.addWidget(frame)
-
         self.setLayout(layout)
 
     def switch_language(self):
