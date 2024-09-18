@@ -40,4 +40,13 @@
     </a>
 </td>
     <td>查看中文文档</td>
+  </tr>
+  <tr>
+    <td>
+    <a href="src/docs/locale/fr/README.fr.md">
+        <img src="src/assets/images/France_Flag.svg" alt="French" width="30" height="20" style="vertical-align: middle;">
+        <span style="margin-left: 5px; vertical-align: middle;">French</span>
+    </a>
+</td>
+    <td>Voir la documentation en français</td>
 </table>
