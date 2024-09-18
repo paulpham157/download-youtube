@@ -2,6 +2,9 @@
 import shutil
 import yt_dlp
 from pathlib import Path
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from bs4 import BeautifulSoup
 
 
 class Utils:
@@ -39,3 +42,35 @@ class Utils:
         single_dir = home_dir / "Downloads" / "DiuTupDownloaderByPaulPham157" / "Single"
         single_dir.mkdir(parents=True, exist_ok=True)
         return str(single_dir)
+
+    def get_shorts_links(channel):
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        driver = webdriver.Chrome(options=chrome_options)
+        driver.get(channel)
+        page_source = driver.page_source
+        soup = BeautifulSoup(page_source, "html.parser")
+        driver.execute_script(
+            """
+            var scroll = setInterval(function(){
+                window.scrollBy(0, 1000);
+            }, 1000);
+        """
+        )
+        updated_page_source = driver.page_source
+        driver.quit()
+        soup = BeautifulSoup(updated_page_source, "html.parser")
+        video_tags = soup.find_all(
+            "a",
+            {
+                "class": "reel-item-endpoint",
+            },
+        )
+        shorts_links = []
+        for video_tag in video_tags:
+            href = video_tag.get("href", "N/A")
+            if "shorts" in href:
+                video_url = "https://www.youtube.com" + href
+                shorts_links.append(video_url)
+        total_shorts = len(shorts_links)
+        return total_shorts, shorts_links
