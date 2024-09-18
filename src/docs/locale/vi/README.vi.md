@@ -1,7 +1,5 @@
 # Diu Túp Downloader
 
-[Switch language](/README.md)
-
 Ứng dụng này cho phép người dùng tải xuống các video từ danh sách phát YouTube dưới dạng tệp MP3.
 
 ## Tính năng
