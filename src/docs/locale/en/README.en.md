@@ -1,4 +1,4 @@
-# YouTube Downloader
+# Diu Túp Downloader
 
 This application allows users to download YouTube playlist videos as MP3 files.
 

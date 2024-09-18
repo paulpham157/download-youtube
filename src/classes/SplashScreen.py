@@ -141,4 +141,4 @@ class SplashScreen(QWidget):
                 content = file.read()
             return markdown.markdown(content)
         except FileNotFoundError:
-            return "Không tìm thấy nội dung cho ngôn ngữ này."
+            return ""
