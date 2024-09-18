@@ -60,10 +60,14 @@ class SplashScreen(QWidget):
         """
         )
         frame_layout.addWidget(self.language_dropdown)
+
+        frame_layout.addStretch()  # Thêm khoảng trống co giãn
+
         self.status_label = QLabel(self.messages.loading_app)
         self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.status_label.setStyleSheet("color: white; font-size: 16px;")
         frame_layout.addWidget(self.status_label)
+
         self.start_button = QPushButton(self.messages.open_app)
         self.start_button.clicked.connect(self.ready_signal.emit)
         self.start_button.hide()
@@ -82,6 +86,7 @@ class SplashScreen(QWidget):
         """
         )
         frame_layout.addWidget(self.start_button)
+
         layout.addWidget(frame)
         self.setLayout(layout)
 
