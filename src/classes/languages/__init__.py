@@ -5,6 +5,7 @@ from .zh.Messages import zh_messages
 from .fr.Messages import fr_messages
 from .de.Messages import de_messages
 from .hi.Messages import hi_messages
+from .pt.Messages import pt_messages
 
 lang_code = {
     "vi": {
@@ -41,6 +42,11 @@ lang_code = {
         "name": "हिंदी",
         "messages": hi_messages,
         "icon": "src/assets/images/India_Flag.svg",
+    },
+    "pt": {
+        "name": "Português",
+        "messages": pt_messages,
+        "icon": "src/assets/images/Portugal_Flag.svg",
     },
 }
 

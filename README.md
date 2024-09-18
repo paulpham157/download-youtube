@@ -57,7 +57,7 @@
         <span style="margin-left: 5px; vertical-align: middle;">German</span>
     </a>
 </td>
-    <td>हिंदी में दस्तावेज़ीकरण देखें</td>
+    <td>Anzeige der Dokumentation in Deutsch</td>
   </tr>
   <tr>
     <td>
@@ -65,4 +65,16 @@
         <img src="src/assets/images/India_Flag.svg" alt="Hindi" width="30" height="20" style="vertical-align: middle;">
         <span style="margin-left: 5px; vertical-align: middle;">Hindi</span>
     </a>
+</td>
+    <td>हिंदी में दस्तावेज़ीकरण देखें</td>
+  </tr>
+  <tr>
+    <td>
+    <a href="src/docs/locale/pt/README.pt.md">
+        <img src="src/assets/images/Portugal_Flag.svg" alt="Portuguese" width="30" height="20" style="vertical-align: middle;">
+        <span style="margin-left: 5px; vertical-align: middle;">Portuguese</span>
+    </a>
+</td>
+    <td>Ver a documentação em português</td>
+  </tr>
 </table>
