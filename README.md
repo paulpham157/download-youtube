@@ -1,4 +1,4 @@
-# YouTube Downloader
+# Diu Túp Downloader
 
 <table>
   <tr>
@@ -22,5 +22,14 @@
     </a>
 </td>
     <td>View documentation in English</td>
+  </tr>
+  <tr>
+    <td>
+    <a href="src/docs/locale/bn/README.bn.md">
+        <img src="src/assets/images/Bangladesh_Flag.svg" alt="Bengali" width="30" height="20" style="vertical-align: middle;">
+        <span style="margin-left: 5px; vertical-align: middle;">Bengali</span>
+    </a>
+</td>
+    <td>View documentation in Bengali</td>
   </tr>
 </table>

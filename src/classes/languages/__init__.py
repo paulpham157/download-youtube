@@ -1,5 +1,6 @@
 from .vi.Messages import vi_messages
 from .en.Messages import en_messages
+from .bn.Messages import bn_messages
 
 lang_code = {
     "vi": {
@@ -11,6 +12,11 @@ lang_code = {
         "name": "English",
         "messages": en_messages,
         "icon": "src/assets/images/United_Kingdom_Flag.svg",
+    },
+    "bn": {
+        "name": "বাংলা",
+        "messages": bn_messages,
+        "icon": "src/assets/images/Bangladesh_Flag.svg",
     },
 }
 
