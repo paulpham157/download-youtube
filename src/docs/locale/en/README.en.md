@@ -1,7 +1,5 @@
 # YouTube Downloader
 
-[Switch language](/README.md)
-
 This application allows users to download YouTube playlist videos as MP3 files.
 
 ## Features
