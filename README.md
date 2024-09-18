@@ -30,6 +30,14 @@
         <span style="margin-left: 5px; vertical-align: middle;">Bengali</span>
     </a>
 </td>
-    <td>View documentation in Bengali</td>
+    <td>বাংলায় ডকুমেন্টেশন দেখুন</td>
   </tr>
+  <tr>
+    <td>
+    <a href="src/docs/locale/zh/README.zh.md">
+        <img src="src/assets/images/China_Flag.svg" alt="Chinese" width="30" height="20" style="vertical-align: middle;">
+        <span style="margin-left: 5px; vertical-align: middle;">Chinese</span>
+    </a>
+</td>
+    <td>查看中文文档</td>
 </table>
