@@ -77,4 +77,30 @@
 </td>
     <td>Ver a documentação em português</td>
   </tr>
+  <tr>
+    <td>
+    <a href="src/docs/locale/ru/README.ru.md">
+        <img src="src/assets/images/Russia_Flag.svg" alt="Russian" width="30" height="20" style="vertical-align: middle;">
+        <span style="margin-left: 5px; vertical-align: middle;">Russian</span>
+    </a>
+</td>
+    <td>Просмотр документации на русском</td>
+  </tr>
+  <tr>
+    <td>
+    <a href="src/docs/locale/ar/README.ar.md">
+        <img src="src/assets/images/Saudi_Arabia_Flag.svg" alt="Arabic" width="30" height="20" style="vertical-align: middle;">
+        <span style="margin-left: 5px; vertical-align: middle;">Arabic</span>
+    </a>
+</td>
+    <td>عربي</td>
+  </tr>
+  <tr>
+    <td>
+    <a href="src/docs/locale/es/README.es.md">
+        <img src="src/assets/images/Spain_Flag.svg" alt="Spanish" width="30" height="20" style="vertical-align: middle;">
+        <span style="margin-left: 5px; vertical-align: middle;">Spanish</span>
+    </a>
+</td>
+    <td>Ver la documentación en español</td>
 </table>
