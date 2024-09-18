@@ -57,4 +57,12 @@
         <span style="margin-left: 5px; vertical-align: middle;">German</span>
     </a>
 </td>
+    <td>हिंदी में दस्तावेज़ीकरण देखें</td>
+  </tr>
+  <tr>
+    <td>
+    <a href="src/docs/locale/hi/README.hi.md">
+        <img src="src/assets/images/India_Flag.svg" alt="Hindi" width="30" height="20" style="vertical-align: middle;">
+        <span style="margin-left: 5px; vertical-align: middle;">Hindi</span>
+    </a>
 </table>
