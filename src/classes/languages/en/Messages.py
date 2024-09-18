@@ -13,7 +13,7 @@ en_messages.ready_to_start = "Ready to start!"
 # ------------------------------------------------------------------------------------------------------#
 # ------------------------------------------------------------------------------------------------------#
 # Start Class DiuTupDownloaderApp
-en_messages.app_name = "YouTube downloader by Paul Pham 157"
+en_messages.app_name = "Diu Túp downloader by Paul Pham 157"
 en_messages.download_location_label = (
     lambda d: f"""MP3 files will be saved at: {d}
 They are organized into subfolders corresponding to playlist names or 'Single' if the URL is a single video"""

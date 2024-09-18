@@ -1,4 +1,4 @@
-# YouTube Downloader
+# Diu Túp Downloader
 
 <table>
   <tr>
@@ -23,4 +23,84 @@
 </td>
     <td>View documentation in English</td>
   </tr>
+  <tr>
+    <td>
+    <a href="src/docs/locale/bn/README.bn.md">
+        <img src="src/assets/images/Bangladesh_Flag.svg" alt="Bengali" width="30" height="20" style="vertical-align: middle;">
+        <span style="margin-left: 5px; vertical-align: middle;">Bengali</span>
+    </a>
+</td>
+    <td>বাংলায় ডকুমেন্টেশন দেখুন</td>
+  </tr>
+  <tr>
+    <td>
+    <a href="src/docs/locale/zh/README.zh.md">
+        <img src="src/assets/images/China_Flag.svg" alt="Chinese" width="30" height="20" style="vertical-align: middle;">
+        <span style="margin-left: 5px; vertical-align: middle;">Chinese</span>
+    </a>
+</td>
+    <td>查看中文文档</td>
+  </tr>
+  <tr>
+    <td>
+    <a href="src/docs/locale/fr/README.fr.md">
+        <img src="src/assets/images/France_Flag.svg" alt="French" width="30" height="20" style="vertical-align: middle;">
+        <span style="margin-left: 5px; vertical-align: middle;">French</span>
+    </a>
+</td>
+    <td>Voir la documentation en français</td>
+  </tr>
+  <tr>
+    <td>
+    <a href="src/docs/locale/de/README.de.md">
+        <img src="src/assets/images/Germany_Flag.svg" alt="German" width="30" height="20" style="vertical-align: middle;">
+        <span style="margin-left: 5px; vertical-align: middle;">German</span>
+    </a>
+</td>
+    <td>Anzeige der Dokumentation in Deutsch</td>
+  </tr>
+  <tr>
+    <td>
+    <a href="src/docs/locale/hi/README.hi.md">
+        <img src="src/assets/images/India_Flag.svg" alt="Hindi" width="30" height="20" style="vertical-align: middle;">
+        <span style="margin-left: 5px; vertical-align: middle;">Hindi</span>
+    </a>
+</td>
+    <td>हिंदी में दस्तावेज़ीकरण देखें</td>
+  </tr>
+  <tr>
+    <td>
+    <a href="src/docs/locale/pt/README.pt.md">
+        <img src="src/assets/images/Portugal_Flag.svg" alt="Portuguese" width="30" height="20" style="vertical-align: middle;">
+        <span style="margin-left: 5px; vertical-align: middle;">Portuguese</span>
+    </a>
+</td>
+    <td>Ver a documentação em português</td>
+  </tr>
+  <tr>
+    <td>
+    <a href="src/docs/locale/ru/README.ru.md">
+        <img src="src/assets/images/Russia_Flag.svg" alt="Russian" width="30" height="20" style="vertical-align: middle;">
+        <span style="margin-left: 5px; vertical-align: middle;">Russian</span>
+    </a>
+</td>
+    <td>Просмотр документации на русском</td>
+  </tr>
+  <tr>
+    <td>
+    <a href="src/docs/locale/ar/README.ar.md">
+        <img src="src/assets/images/Saudi_Arabia_Flag.svg" alt="Arabic" width="30" height="20" style="vertical-align: middle;">
+        <span style="margin-left: 5px; vertical-align: middle;">Arabic</span>
+    </a>
+</td>
+    <td>عربي</td>
+  </tr>
+  <tr>
+    <td>
+    <a href="src/docs/locale/es/README.es.md">
+        <img src="src/assets/images/Spain_Flag.svg" alt="Spanish" width="30" height="20" style="vertical-align: middle;">
+        <span style="margin-left: 5px; vertical-align: middle;">Spanish</span>
+    </a>
+</td>
+    <td>Ver la documentación en español</td>
 </table>
