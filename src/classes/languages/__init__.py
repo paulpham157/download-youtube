@@ -6,6 +6,9 @@ from .fr.Messages import fr_messages
 from .de.Messages import de_messages
 from .hi.Messages import hi_messages
 from .pt.Messages import pt_messages
+from .ru.Messages import ru_messages
+from .ar.Messages import ar_messages
+from .es.Messages import es_messages
 
 lang_code = {
     "vi": {
@@ -47,6 +50,21 @@ lang_code = {
         "name": "Português",
         "messages": pt_messages,
         "icon": "src/assets/images/Portugal_Flag.svg",
+    },
+    "ru": {
+        "name": "Русский",
+        "messages": ru_messages,
+        "icon": "src/assets/images/Russia_Flag.svg",
+    },
+    "ar": {
+        "name": "العربية",
+        "messages": ar_messages,
+        "icon": "src/assets/images/Saudi_Arabia_Flag.svg",
+    },
+    "es": {
+        "name": "Español",
+        "messages": es_messages,
+        "icon": "src/assets/images/Spain_Flag.svg",
     },
 }
 
