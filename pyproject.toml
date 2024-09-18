@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-version = "2.4.9"
+version = "3.0.2"
 name = "diu-tup-downloader"
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -28,6 +28,7 @@ dependencies = [
     "pyinstaller",
     "beautifulsoup4",
     "selenium",
+    "markdown",
 ]
 
 [project.scripts]

@@ -1,6 +1,10 @@
 #!/bin/bash
-if [ "$1" = "--new" ]; then
+if [ "$1" = "--clean" ]; then
+    rm -rf build dist *.spec *.egg-info
     conda activate yt-dlp
+    pip freeze > requirements.txt
+    pip uninstall -y -r requirements.txt
+    rm requirements.txt
     pip install -e .
 fi
 
