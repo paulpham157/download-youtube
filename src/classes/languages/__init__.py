@@ -3,6 +3,7 @@ from .en.Messages import en_messages
 from .bn.Messages import bn_messages
 from .zh.Messages import zh_messages
 from .fr.Messages import fr_messages
+from .de.Messages import de_messages
 
 lang_code = {
     "vi": {
@@ -29,6 +30,11 @@ lang_code = {
         "name": "Français",
         "messages": fr_messages,
         "icon": "src/assets/images/France_Flag.svg",
+    },
+    "de": {
+        "name": "Deutsch",
+        "messages": de_messages,
+        "icon": "src/assets/images/Germany_Flag.svg",
     },
 }
 

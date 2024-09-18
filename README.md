@@ -49,4 +49,12 @@
     </a>
 </td>
     <td>Voir la documentation en français</td>
+  </tr>
+  <tr>
+    <td>
+    <a href="src/docs/locale/de/README.de.md">
+        <img src="src/assets/images/Germany_Flag.svg" alt="German" width="30" height="20" style="vertical-align: middle;">
+        <span style="margin-left: 5px; vertical-align: middle;">German</span>
+    </a>
+</td>
 </table>
