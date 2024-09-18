@@ -65,6 +65,7 @@ class DownloaderThread(QThread):
             "ffmpeg_location": self.ffmpeg_path,
             "extract_flat": True,
             "no_color": True,
+            "ignoreerrors": True,
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(playlist_url, download=False)
@@ -74,32 +75,49 @@ class DownloaderThread(QThread):
                         "title", self.messages.unknown_playlist_name
                     )
                     self.current_playlist_name = self.playlist_title
-                    self.original_total_videos = len(info["entries"])
-                    self.total_videos = self.original_total_videos
-                    self.progress.emit(
-                        self.messages.filtering_private_video(
-                            self.total_videos, self.playlist_title
-                        )
-                    )
                     playlist_dir = os.path.join(self.download_dir, self.playlist_title)
                     os.makedirs(playlist_dir, exist_ok=True)
-                    for entry in info["entries"]:
-                        if self.is_cancelled:
-                            break
-                        title = entry.get("title")
-                        views = entry.get("view_count")
-                        is_private = title == "[Private video]" or views is None
-                        if is_private:
-                            self.total_videos -= 1
-                            self.progress.emit(
-                                self.messages.count_private_video(self.total_videos)
+                    total_entries = len(info["entries"])
+                    if total_entries > 0:
+                        self.original_total_videos = total_entries
+                        self.total_videos = self.original_total_videos
+                        self.progress.emit(
+                            self.messages.filtering_private_video(
+                                self.total_videos, self.playlist_title
                             )
-                            continue
-                        else:
-                            entry_url = entry.get("url")
-                            if entry_url:
-                                ydl.download([str(entry_url)])
-                                self.move_file_to_playlist(playlist_dir)
+                        )
+                        for entry in info["entries"]:
+                            if self.is_cancelled:
+                                break
+                            title = entry.get("title")
+                            views = entry.get("view_count")
+                            is_private = title == "[Private video]" or views is None
+                            if is_private:
+                                self.total_videos -= 1
+                                self.progress.emit(
+                                    self.messages.count_private_video(self.total_videos)
+                                )
+                                continue
+                            else:
+                                entry_url = entry.get("url")
+                                if entry_url:
+                                    ydl.download([str(entry_url)])
+                                    self.move_file_to_playlist(playlist_dir)
+                    else:
+                        total_shorts, shorts_links = Utils.get_shorts_links(
+                            playlist_url
+                        )
+                        self.original_total_videos = total_shorts
+                        self.total_videos = self.original_total_videos
+                        self.progress.emit(
+                            self.messages.filtering_private_video(
+                                self.total_videos, self.playlist_title
+                            )
+                        )
+                        for link in shorts_links:
+                            ydl.download([str(link)])
+                            self.move_file_to_playlist(playlist_dir)
+
                 else:
                     self.total_videos = 1
                     self.original_total_videos = 1

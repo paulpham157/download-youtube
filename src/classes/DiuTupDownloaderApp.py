@@ -145,7 +145,8 @@ class DiuTupDownloaderApp(QWidget):
             self.set_status(self.messages.ffmpeg_warning_message)
             return
         url = self.url_input.text().strip()
-        if (not url) or ("youtube.com" not in url):
+        if (not url) and ("youtube.com" not in url) and ("youtu.be" not in url):
+            # TODO: support shortened link youtu.be
             self.set_status(self.messages.invalid_url_message)
             return
         self.url_input.setEnabled(False)
