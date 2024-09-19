@@ -1,3 +1,4 @@
+from ..Utils import Utils
 from .vi.Messages import vi_messages
 from .en.Messages import en_messages
 from .bn.Messages import bn_messages
@@ -14,57 +15,57 @@ lang_code = {
     "vi": {
         "name": "Tiếng Việt",
         "messages": vi_messages,
-        "icon": "src/assets/images/Vietnam_Flag.svg",
+        "icon": Utils.get_base_path(path="src/assets/images/Vietnam_Flag.svg"),
     },
     "en": {
         "name": "English",
         "messages": en_messages,
-        "icon": "src/assets/images/United_Kingdom_Flag.svg",
+        "icon": Utils.get_base_path(path="src/assets/images/United_Kingdom_Flag.svg"),
     },
     "bn": {
         "name": "বাংলা",
         "messages": bn_messages,
-        "icon": "src/assets/images/Bangladesh_Flag.svg",
+        "icon": Utils.get_base_path(path="src/assets/images/Bangladesh_Flag.svg"),
     },
     "zh": {
         "name": "中文",
         "messages": zh_messages,
-        "icon": "src/assets/images/China_Flag.svg",
+        "icon": Utils.get_base_path(path="src/assets/images/China_Flag.svg"),
     },
     "fr": {
         "name": "Français",
         "messages": fr_messages,
-        "icon": "src/assets/images/France_Flag.svg",
+        "icon": Utils.get_base_path(path="src/assets/images/France_Flag.svg"),
     },
     "de": {
         "name": "Deutsch",
         "messages": de_messages,
-        "icon": "src/assets/images/Germany_Flag.svg",
+        "icon": Utils.get_base_path(path="src/assets/images/Germany_Flag.svg"),
     },
     "hi": {
         "name": "हिंदी",
         "messages": hi_messages,
-        "icon": "src/assets/images/India_Flag.svg",
+        "icon": Utils.get_base_path(path="src/assets/images/India_Flag.svg"),
     },
     "pt": {
         "name": "Português",
         "messages": pt_messages,
-        "icon": "src/assets/images/Portugal_Flag.svg",
+        "icon": Utils.get_base_path(path="src/assets/images/Portugal_Flag.svg"),
     },
     "ru": {
         "name": "Русский",
         "messages": ru_messages,
-        "icon": "src/assets/images/Russia_Flag.svg",
+        "icon": Utils.get_base_path(path="src/assets/images/Russia_Flag.svg"),
     },
     "ar": {
         "name": "العربية",
         "messages": ar_messages,
-        "icon": "src/assets/images/Saudi_Arabia_Flag.svg",
+        "icon": Utils.get_base_path(path="src/assets/images/Saudi_Arabia_Flag.svg"),
     },
     "es": {
         "name": "Español",
         "messages": es_messages,
-        "icon": "src/assets/images/Spain_Flag.svg",
+        "icon": Utils.get_base_path(path="src/assets/images/Spain_Flag.svg"),
     },
 }
 

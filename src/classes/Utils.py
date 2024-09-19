@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import sys
+import os
 import shutil
 import yt_dlp
 from pathlib import Path
@@ -74,3 +76,13 @@ class Utils:
                 shorts_links.append(video_url)
         total_shorts = len(shorts_links)
         return total_shorts, shorts_links
+
+    def get_base_path(path):
+        if getattr(sys, "frozen", False):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.dirname(
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            )
+        path = os.path.join(base_path, path)
+        return path
