@@ -1,11 +1,15 @@
 #!/bin/bash
-if [ "$1" = "--clean" ]; then
-    rm -rf build dist *.spec *.egg-info
+if [ "$1" = "--cleanup" ]; then
+    rm -rf build dist *.spec *.egg-info src/*.egg-info
     conda activate yt-dlp
     pip freeze > requirements.txt
     pip uninstall -y -r requirements.txt
     rm requirements.txt
     pip install -e .
+fi
+
+if [ "$1" = "--clear" ]; then
+    rm -rf build dist *.spec *.egg-info src/*.egg-info
 fi
 
 if [ ! -d "src/vendors/ffmpeg" ]; then
@@ -45,30 +49,33 @@ else
     exit 1
 fi
 
+version=$(grep -E '^version\s*=' pyproject.toml | awk -F'"' '{print $2}')
+app_name="DiuTupDownloaderByPaulPham157_v${version}"
+
 build_macos() {
     echo "Đang build cho macOS..."
-    pyinstaller --name="macOS-DiuTupDownloaderByPaulPham157" \
+    pyinstaller --name="macOS-${app_name}" \
                 --icon 'src/assets/images/DiuTupDownloaderByPaulPham157.icns' \
                 --windowed \
                 --onefile \
                 --noconfirm \
                 --add-data "src/vendors/ffmpeg/ffmpeg:src/vendors/ffmpeg/ffmpeg" \
-                --add-data "src/assets/images:src/assets/images" \
+                --add-data "src/assets:src/assets" \
+                --add-data "src/docs:src/docs" \
                 src/app.py
-    if [ -d "dist/macOS-DiuTupDownloaderByPaulPham157.app" ]; then
+    if [ -d "dist/macOS-${app_name}.app" ]; then
         echo "Đang nén file macOS..."
-        version=$(grep -E '^version\s*=' pyproject.toml | awk -F'"' '{print $2}')
-        zip_name="macos-dtdbpp157_v-${version}.zip"
-        (cd dist && zip -r "$zip_name" "macOS-DiuTupDownloaderByPaulPham157.app" && cp -av $zip_name ~/Downloads/)
+        zip_name="macos-${app_name}_v-${version}.zip"
+        (cd dist && zip -r "$zip_name" "macOS-${app_name}.app" && cp -av $zip_name ~/Downloads/)
         echo "Đã tạo file nén: $zip_name"
     else
-        echo "Không tìm thấy thư mục dist/macOS-DiuTupDownloaderByPaulPham157.app"
+        echo "Không tìm thấy thư mục dist/macOS-${app_name}.app"
     fi
 }
 
 build_windows() {
     echo "Đang build cho Windows..."
-    pyinstaller --name="Windows-DiuTupDownloaderByPaulPham157" \
+    pyinstaller --name="Windows-${app_name}" \
                 --icon 'src/assets/images/DiuTupDownloaderByPaulPham157.ico' \
                 --windowed \
                 --onefile \
@@ -76,16 +83,16 @@ build_windows() {
                 --add-data "src/vendors/ffmpeg/ffmpeg.exe:src/vendors/ffmpeg/ffmpeg.exe" \
                 --add-data "src/vendors/ffmpeg/ffplay.exe:src/vendors/ffmpeg/ffplay.exe" \
                 --add-data "src/vendors/ffmpeg/ffprobe.exe:src/vendors/ffmpeg/ffprobe.exe" \
-                --add-data "src/assets/images:src/assets/images" \
+                --add-data "src/assets:src/assets" \
+                --add-data "src/docs:src/docs" \
                 src/app.py
-    if [ -f "dist/Windows-DiuTupDownloaderByPaulPham157" ]; then
+    if [ -f "dist/Windows-${app_name}" ]; then
         echo "Đang nén file Windows..."
-        version=$(grep -E '^version\s*=' pyproject.toml | awk -F'"' '{print $2}')
-        zip_name="windows-dtdbpp157_v-${version}.zip"
-        (cd dist && zip -r "$zip_name" "Windows-DiuTupDownloaderByPaulPham157.exe" && cp -av $zip_name ~/Downloads/)
+        zip_name="windows-${app_name}_v-${version}.zip"
+        (cd dist && zip -r "$zip_name" "Windows-${app_name}.exe" && cp -av $zip_name ~/Downloads/)
         echo "Đã tạo file nén: $zip_name"
     else
-        echo "Không tìm thấy file dist/Windows-DiuTupDownloaderByPaulPham157.exe"
+        echo "Không tìm thấy file dist/Windows-${app_name}.exe"
     fi
 }
 
@@ -105,7 +112,7 @@ wine_build_windows() {
         echo "Wine đã được cài đặt."
     fi
     echo "Đang build cho Windows trên môi trường Wine..."
-    wine pyinstaller --name="Windows-DiuTupDownloaderByPaulPham157" \
+    wine pyinstaller --name="Windows-${app_name}" \
                 --icon 'src/assets/images/DiuTupDownloaderByPaulPham157.ico' \
                 --windowed \
                 --onefile \
@@ -113,16 +120,16 @@ wine_build_windows() {
                 --add-data "src/vendors/ffmpeg/ffmpeg.exe:src/vendors/ffmpeg/ffmpeg.exe" \
                 --add-data "src/vendors/ffmpeg/ffplay.exe:src/vendors/ffmpeg/ffplay.exe" \
                 --add-data "src/vendors/ffmpeg/ffprobe.exe:src/vendors/ffmpeg/ffprobe.exe" \
-                --add-data "src/assets/images:src/assets/images" \
+                --add-data "src/assets:src/assets" \
+                --add-data "src/docs:src/docs" \
                 src/app.py
-    if [ -f "dist/Windows-DiuTupDownloaderByPaulPham157" ]; then
+    if [ -f "dist/Windows-${app_name}" ]; then
         echo "Đang nén file Windows..."
-        version=$(grep -E '^version\s*=' pyproject.toml | awk -F'"' '{print $2}')
-        zip_name="windows-dtdbpp157_v-${version}.zip"
-        (cd dist && zip -r "$zip_name" "Windows-DiuTupDownloaderByPaulPham157.exe" && cp -av $zip_name ~/Downloads/)
+        zip_name="windows-${app_name}_v-${version}.zip"
+        (cd dist && zip -r "$zip_name" "Windows-${app_name}.exe" && cp -av $zip_name ~/Downloads/)
         echo "Đã tạo file nén: $zip_name"
     else
-        echo "Không tìm thấy file dist/Windows-DiuTupDownloaderByPaulPham157.exe"
+        echo "Không tìm thấy file dist/Windows-${app_name}.exe"
     fi
 }
 
