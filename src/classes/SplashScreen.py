@@ -5,11 +5,10 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QComboBox,
     QFrame,
-    QTextEdit,
-    QScrollArea,
+    QTextBrowser,
 )
 from PyQt6.QtCore import Qt, pyqtSignal
-from PyQt6.QtGui import QBrush, QPalette, QIcon, QPixmap
+from PyQt6.QtGui import QBrush, QPalette, QIcon, QPixmap, QDesktopServices
 from .languages import get_messages, lang_code
 from .Utils import Utils
 import markdown
@@ -73,11 +72,12 @@ class SplashScreen(QWidget):
         """
         )
         frame_layout.addWidget(self.language_dropdown)
-        self.content_area = QTextEdit()
-        self.content_area.setReadOnly(True)
+        self.content_area = QTextBrowser()
+        self.content_area.setOpenExternalLinks(True)
+        self.content_area.anchorClicked.connect(self.handle_link_click)
         self.content_area.setStyleSheet(
             """
-            QTextEdit {
+            QTextBrowser {
                 background-color: rgba(40, 40, 40, 200);
                 color: white;
                 border: none;
@@ -135,11 +135,25 @@ class SplashScreen(QWidget):
         self.status_label.setText(self.messages.ready_to_start)
         self.start_button.show()
 
+    def handle_link_click(self, url):
+        QDesktopServices.openUrl(url)
+
     def load_content(self, lang):
         file_path = Utils.get_base_path(path=f"src/docs/locale/{lang}/README.{lang}.md")
         try:
             with open(file_path, "r", encoding="utf-8") as file:
                 content = file.read()
-            return markdown.markdown(content)
+            html_content = markdown.markdown(content)
+            # Thêm CSS để làm nổi bật liên kết
+            html_content = f"""
+            <style>
+            a {{
+                color: #0d6efd;
+                text-decoration: underline;
+            }}
+            </style>
+            {html_content}
+            """
+            return html_content
         except FileNotFoundError:
             return ""
