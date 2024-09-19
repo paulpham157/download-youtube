@@ -126,13 +126,7 @@ class DiuTupDownloaderApp(QWidget):
         is_ffmpeg_vendors_exists, ffmpeg_vendors_path = Utils.check_ffmpeg()
         if not is_ffmpeg_vendors_exists:
             ffmpeg_vendors_path.mkdir(parents=True, exist_ok=True)
-        if getattr(sys, "frozen", False):
-            base_path = sys._MEIPASS
-        else:
-            base_path = os.path.dirname(
-                os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            )
-        ffmpeg_path = os.path.join(base_path, "src", "vendors", "ffmpeg", "ffmpeg")
+        ffmpeg_path = Utils.get_base_path(path="src/vendors/ffmpeg/ffmpeg")
         if sys.platform == "win32":
             ffmpeg_path += ".exe"
         if os.path.exists(ffmpeg_path):
