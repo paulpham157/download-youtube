@@ -11,6 +11,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QBrush, QPalette, QIcon, QPixmap
 from .languages import get_messages, lang_code
+from .Utils import Utils
 import markdown
 
 
@@ -26,7 +27,9 @@ class SplashScreen(QWidget):
 
     def initUI(self):
         self.setWindowTitle(self.messages.splash_screen_title)
-        background = QPixmap("src/assets/images/splash_background.jpg")
+        background = QPixmap(
+            Utils.get_base_path(path="src/assets/images/splash_background.jpg")
+        )
         self.setFixedSize(background.width(), background.height())
         palette = self.palette()
         palette.setBrush(QPalette.ColorRole.Window, QBrush(background))
@@ -52,26 +55,24 @@ class SplashScreen(QWidget):
             self.language_dropdown.addItem(icon, lang_info["name"], code)
         self.language_dropdown.currentIndexChanged.connect(self.switch_language)
         self.language_dropdown.setStyleSheet(
-            """
-            QComboBox {
+            f"""
+            QComboBox {{
                 background-color: #2a2a2a;
                 color: white;
                 border: 1px solid #3a3a3a;
                 padding: 5px;
-            }
-            QComboBox::drop-down {
+            }}
+            QComboBox::drop-down {{
                 border: 0px;
-            }
-            QComboBox::down-arrow {
-                image: url(src/assets/images/dropdown_arrow.png);
+            }}
+            QComboBox::down-arrow {{
+                image: url({Utils.get_base_path(path="src/assets/images/dropdown_arrow.png")});
                 width: 12px;
                 height: 12px;
-            }
+            }}
         """
         )
         frame_layout.addWidget(self.language_dropdown)
-
-        # Thêm vùng hiển thị nội dung
         self.content_area = QTextEdit()
         self.content_area.setReadOnly(True)
         self.content_area.setStyleSheet(
@@ -135,7 +136,7 @@ class SplashScreen(QWidget):
         self.start_button.show()
 
     def load_content(self, lang):
-        file_path = f"src/docs/locale/{lang}/README.{lang}.md"
+        file_path = Utils.get_base_path(path=f"src/docs/locale/{lang}/README.{lang}.md")
         try:
             with open(file_path, "r", encoding="utf-8") as file:
                 content = file.read()
