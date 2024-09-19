@@ -50,7 +50,7 @@ else
 fi
 
 version=$(grep -E '^version\s*=' pyproject.toml | awk -F'"' '{print $2}')
-app_name="DiuTupDownloaderByPaulPham157_v${version}"
+app_name="DiuTupDownloaderByPaulPham157_v-${version}"
 
 build_macos() {
     echo "Đang build cho macOS..."
@@ -65,7 +65,7 @@ build_macos() {
                 src/app.py
     if [ -d "dist/macOS-${app_name}.app" ]; then
         echo "Đang nén file macOS..."
-        zip_name="macos-${app_name}_v-${version}.zip"
+        zip_name="macos-${app_name}.zip"
         (cd dist && zip -r "$zip_name" "macOS-${app_name}.app" && cp -av $zip_name ~/Downloads/)
         echo "Đã tạo file nén: $zip_name"
     else
@@ -88,7 +88,7 @@ build_windows() {
                 src/app.py
     if [ -f "dist/Windows-${app_name}" ]; then
         echo "Đang nén file Windows..."
-        zip_name="windows-${app_name}_v-${version}.zip"
+        zip_name="windows-${app_name}.zip"
         (cd dist && zip -r "$zip_name" "Windows-${app_name}.exe" && cp -av $zip_name ~/Downloads/)
         echo "Đã tạo file nén: $zip_name"
     else
@@ -125,7 +125,7 @@ wine_build_windows() {
                 src/app.py
     if [ -f "dist/Windows-${app_name}" ]; then
         echo "Đang nén file Windows..."
-        zip_name="windows-${app_name}_v-${version}.zip"
+        zip_name="windows-${app_name}.zip"
         (cd dist && zip -r "$zip_name" "Windows-${app_name}.exe" && cp -av $zip_name ~/Downloads/)
         echo "Đã tạo file nén: $zip_name"
     else
