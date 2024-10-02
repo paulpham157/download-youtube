@@ -15,10 +15,12 @@ ar_messages.ready_to_start = "جاهز للبدء!"
 # Start Class DiuTupDownloaderApp
 ar_messages.app_name = "Diu Túp downloader by Paul Pham 157"
 ar_messages.download_location_label = (
-    lambda d: f"""سيتم حفظ ملفات MP3 في: {d}
+    lambda d: f"""سيتم حفظ ملفات MP3, MP4 في: {d}
 يتم تقسيمها إلى مجلدات فرعية تتوافق مع أسماء قوائم التشغيل أو Single إذا كان عنوان URL لفيديو واحد"""
 )
 ar_messages.url_input_placeholder = "عنوان URL"
+ar_messages.radio_audio_only = "صوت فقط"
+ar_messages.radio_video = "تنزيل الفيديو"
 ar_messages.clear_button = "مسح"
 ar_messages.logs_label = "السجلات:"
 ar_messages.copy_button = "نسخ"

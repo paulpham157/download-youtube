@@ -15,10 +15,12 @@ zh_messages.ready_to_start = "准备开始！"
 # Start Class DiuTupDownloaderApp
 zh_messages.app_name = "Diu Túp downloader by Paul Pham 157"
 zh_messages.download_location_label = (
-    lambda d: f"""MP3文件将保存在：{d}
+    lambda d: f"""MP3, MP4 文件将保存在：{d}
 它们将被分类到与播放列表名称相对应的子文件夹中，或者如果是单个视频，则保存在Single文件夹中"""
 )
 zh_messages.url_input_placeholder = "URL地址"
+zh_messages.radio_audio_only = "仅下载音频"
+zh_messages.radio_video = "下载视频"
 zh_messages.clear_button = "清除"
 zh_messages.logs_label = "日志："
 zh_messages.copy_button = "复制"

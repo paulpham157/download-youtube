@@ -15,10 +15,12 @@ fr_messages.ready_to_start = "Prêt à commencer !"
 # Start Class DiuTupDownloaderApp
 fr_messages.app_name = "Diu Túp downloader by Paul Pham 157"
 fr_messages.download_location_label = (
-    lambda d: f"""Les fichiers mp3 seront enregistrés à : {d}
+    lambda d: f"""Les fichiers mp3, mp4 seront enregistrés à : {d}
 Ils sont répartis dans des sous-dossiers correspondant aux noms des playlists ou Single si l'URL est une vidéo unique"""
 )
 fr_messages.url_input_placeholder = "Adresse URL"
+fr_messages.radio_audio_only = "Seulement audio"
+fr_messages.radio_video = "Télécharger la vidéo"
 fr_messages.clear_button = "Effacer"
 fr_messages.logs_label = "Journal :"
 fr_messages.copy_button = "Copier"

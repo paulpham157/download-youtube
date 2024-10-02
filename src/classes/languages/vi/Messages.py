@@ -15,10 +15,12 @@ vi_messages.ready_to_start = "Sẵn sàng để bắt đầu!"
 # Start Class DiuTupDownloaderApp
 vi_messages.app_name = "Diu Túp downloader by Paul Pham 157"
 vi_messages.download_location_label = (
-    lambda d: f"""Các file mp3 sẽ lưu tại: {d}
+    lambda d: f"""Các file mp3, mp4 sẽ lưu tại: {d}
 Chúng được chia vào các thư mục con tương ứng với tên của playlist hoặc Single nếu url là video đơn lẻ"""
 )
 vi_messages.url_input_placeholder = "Địa chỉ URL"
+vi_messages.radio_audio_only = "Chỉ tải âm thanh"
+vi_messages.radio_video = "Tải video"
 vi_messages.clear_button = "Xoá"
 vi_messages.logs_label = "Nhật ký:"
 vi_messages.copy_button = "Sao chép"

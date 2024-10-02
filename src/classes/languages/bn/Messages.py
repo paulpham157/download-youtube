@@ -15,10 +15,12 @@ bn_messages.ready_to_start = "শুরু করতে প্রস্তুত
 # Start Class DiuTupDownloaderApp
 bn_messages.app_name = "Diu Túp downloader by Paul Pham 157"
 bn_messages.download_location_label = (
-    lambda d: f"""এমপি৩ ফাইলগুলি এখানে সংরক্ষিত হবে: {d}
+    lambda d: f"""MP3, MP4 ফাইলগুলি এখানে সংরক্ষিত হবে: {d}
 এগুলি প্লেলিস্টের নাম অনুযায়ী সাব-ফোল্ডারে বিভক্ত হবে অথবা একক ভিডিওর ক্ষেত্রে সিঙ্গেল ফোল্ডারে থাকবে"""
 )
 bn_messages.url_input_placeholder = "URL ঠিকানা"
+bn_messages.radio_audio_only = "শুধুমাত্র অডিও"
+bn_messages.radio_video = "ভিডিও ডাউনলোড করুন"
 bn_messages.clear_button = "মুছুন"
 bn_messages.logs_label = "লগ:"
 bn_messages.copy_button = "কপি করুন"
