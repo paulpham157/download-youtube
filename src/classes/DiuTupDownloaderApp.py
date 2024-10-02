@@ -12,6 +12,7 @@ from PyQt6.QtWidgets import (
     QProgressBar,
     QMessageBox,
     QTextEdit,
+    QRadioButton,
 )
 from PyQt6.QtGui import QFont
 from .Utils import Utils
@@ -57,6 +58,13 @@ class DiuTupDownloaderApp(QWidget):
         self.clear_button.clicked.connect(self.clear_url)
         url_layout.addWidget(self.clear_button)
         layout.addLayout(url_layout)
+        radio_layout = QHBoxLayout()
+        self.audio_only_radio = QRadioButton(self.messages.radio_audio_only)
+        self.audio_only_radio.setChecked(True)
+        radio_layout.addWidget(self.audio_only_radio)
+        self.video_radio = QRadioButton(self.messages.radio_video)
+        radio_layout.addWidget(self.video_radio)
+        layout.addLayout(radio_layout)
         self.status_label = QLabel(self.messages.instruction)
         self.status_label.setWordWrap(True)
         layout.addWidget(self.status_label)

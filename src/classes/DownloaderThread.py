@@ -51,22 +51,40 @@ class DownloaderThread(QThread):
             self.error.emit(str(e))
 
     def download_playlist(self, playlist_url):
-        ydl_opts = {
-            "format": "bestaudio/best",
-            "postprocessors": [
-                {
-                    "key": "FFmpegExtractAudio",
-                    "preferredcodec": "mp3",
-                    "preferredquality": "192",
-                }
-            ],
-            "outtmpl": os.path.join(str(self.download_dir), "%(title)s.%(ext)s"),
-            "progress_hooks": [self.progress_hook],
-            "ffmpeg_location": self.ffmpeg_path,
-            "extract_flat": True,
-            "no_color": True,
-            "ignoreerrors": True,
-        }
+        if self.app.video_radio.isChecked():
+            ydl_opts = {
+                "format": "bestvideo+bestaudio/best",
+                "postprocessors": [
+                    {
+                        "key": "FFmpegVideoConvertor",
+                        "preferedformat": "mp4",
+                    }
+                ],
+                "outtmpl": os.path.join(str(self.download_dir), "%(title)s.%(ext)s"),
+                "progress_hooks": [self.progress_hook],
+                "ffmpeg_location": self.ffmpeg_path,
+                "extract_flat": True,
+                "no_color": True,
+                "ignoreerrors": True,
+            }
+        elif self.app.audio_only_radio.isChecked():
+            ydl_opts = {
+                "format": "bestaudio/best",
+                "postprocessors": [
+                    {
+                        "key": "FFmpegExtractAudio",
+                        "preferredcodec": "mp3",
+                        "preferredquality": "192",
+                    }
+                ],
+                "outtmpl": os.path.join(str(self.download_dir), "%(title)s.%(ext)s"),
+                "progress_hooks": [self.progress_hook],
+                "ffmpeg_location": self.ffmpeg_path,
+                "extract_flat": True,
+                "no_color": True,
+                "ignoreerrors": True,
+            }
+
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(playlist_url, download=False)
             if info is not None:
@@ -127,7 +145,7 @@ class DownloaderThread(QThread):
 
     def move_file_to_playlist(self, destination_dir):
         for file in os.listdir(self.download_dir):
-            if file.endswith(".mp3"):
+            if file.endswith(".mp3") or file.endswith(".mp4"):
                 source_path = os.path.join(str(self.download_dir), file)
                 destination_path = os.path.join(str(destination_dir), file)
                 shutil.move(source_path, destination_path)
